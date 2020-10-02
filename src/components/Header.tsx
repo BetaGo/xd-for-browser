@@ -1,12 +1,14 @@
 import styled from "@emotion/styled";
-import React from "react";
-import ShowMenuIcon from "@spectrum-icons/workflow/ShowMenu";
 import HomeIcon from "@spectrum-icons/workflow/Home";
-import { NavLink, useHistory } from "react-router-dom";
+import React from "react";
+import { NavLink } from "react-router-dom";
+
+import Menu from "./Menu";
 
 const Root = styled.div`
   width: 100%;
   height: 40px;
+  font-size: 13px;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: auto;
@@ -73,7 +75,7 @@ const Header = () => {
     <Root>
       <LeftActions>
         <LeftActionItem>
-          <ShowMenuIcon size="S" />
+          <Menu />
         </LeftActionItem>
         <LeftActionItem onClick={() => window.open(window.location.origin)}>
           <HomeIcon size="S" />

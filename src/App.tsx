@@ -1,13 +1,13 @@
-import { defaultTheme, Provider } from "@adobe/react-spectrum";
+import { defaultTheme, Divider, Provider } from "@adobe/react-spectrum";
+import styled from "@emotion/styled";
 import React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import Home from "./pages/Home";
-import styled from "@emotion/styled";
-import Header from "./components/Header";
-import ToolBox from "./components/ToolBox";
+
 import Canvas from "./components/Canvas";
+import Header from "./components/Header";
 import PropertyEditor from "./components/PropertyEditor";
-import { Divider } from "@adobe/react-spectrum";
+import ToolBox from "./components/ToolBox";
+import Home from "./pages/Home";
 
 const GridRoot = styled.div`
   width: 100%;
