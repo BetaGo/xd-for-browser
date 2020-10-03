@@ -1,10 +1,12 @@
 import EventEmitter from "eventemitter3";
 import { IElementEventMap } from "./events";
 import { GRender } from "./gRender";
+import { IStyle } from "./style";
 import { IPoint } from "./utils";
 
 export abstract class Element {
-  style: any;
+  visible: boolean = true;
+  style?: IStyle;
   transform: any;
   gRender?: GRender;
   eventEmitter = new EventEmitter();
@@ -30,7 +32,19 @@ export abstract class Element {
     this.eventEmitter.emit(type, data);
   }
 
-  abstract show(): void;
-  abstract hidden(): void;
+  remove() {
+    this.eventEmitter.removeAllListeners();
+    this.gRender?.remove(this);
+  }
+
+  show() {
+    this.visible = true;
+  }
+
+  hide() {
+    this.visible = false;
+  }
+
+  abstract render(): void;
   abstract isInnerPoint(point: IPoint): boolean;
 }

@@ -1,18 +1,18 @@
-import ResizeObserver from "resize-observer-polyfill";
 import EventEmitter from "eventemitter3";
+import ResizeObserver from "resize-observer-polyfill";
 
 import { Element } from "./element";
-import { IPoint } from "./utils";
+import { IPoint, setupCanvas } from "./utils";
 
 export class GRender {
   containerElement: HTMLElement;
   canvasElement: HTMLCanvasElement;
   canvasCtx2D: CanvasRenderingContext2D;
-  elements: Element[] = [];
+  elements: Set<Element> = new Set();
 
   private eventEmitter = new EventEmitter();
 
-  private containerResizeObserver = new ResizeObserver((entries) => {
+  private canvasResizeObserver = new ResizeObserver((entries) => {
     for (const entry of entries) {
       if (entry.target === this.containerElement) {
         this.resizeCanvas();
@@ -25,10 +25,13 @@ export class GRender {
     this.containerElement = container;
 
     this.canvasElement = document.createElement("canvas");
-    this.canvasElement.setAttribute("style", `display: block;`);
+    this.canvasElement.setAttribute(
+      "style",
+      `display: block; width: 100%; heigh: 100%`
+    );
     this.containerElement.appendChild(this.canvasElement);
 
-    this.canvasCtx2D = this.canvasElement.getContext("2d")!;
+    this.canvasCtx2D = setupCanvas(this.canvasElement)!;
 
     this.resizeCanvas();
 
@@ -37,7 +40,7 @@ export class GRender {
     // 自定义事件监听
     this.listenCustomEvents();
     // resize 事件监听
-    this.containerResizeObserver.observe(this.containerElement);
+    this.canvasResizeObserver.observe(this.canvasElement);
   }
 
   resizeCanvas() {
@@ -45,8 +48,7 @@ export class GRender {
     const h = this.containerElement.clientHeight;
 
     if (w !== this.canvasElement.width || h !== this.canvasElement.height) {
-      this.canvasElement.setAttribute("width", String(w));
-      this.canvasElement.setAttribute("height", String(h));
+      this.canvasCtx2D = setupCanvas(this.canvasElement)!;
       this.canvasCtx2D.save();
       this.canvasCtx2D.fillStyle = "rgb(228,228,228)";
       this.canvasCtx2D.fillRect(0, 0, w, h);
@@ -55,12 +57,17 @@ export class GRender {
   }
 
   render() {
-    this.elements.forEach((e) => e.show());
+    this.elements.forEach((e) => e.render());
   }
 
   add(element: Element) {
     element.gRender = this;
-    this.elements.push(element);
+    this.elements.add(element);
+  }
+
+  remove(element: Element) {
+    this.elements.delete(element);
+    this.render();
   }
 
   listenCanvasDomEvents() {
@@ -80,8 +87,7 @@ export class GRender {
 
   listenCustomEvents() {
     this.eventEmitter.on("click", (data: IPoint) => {
-      for (let i = 0; i < this.elements.length; i++) {
-        let currentElement = this.elements[i];
+      for (const currentElement of this.elements) {
         if (currentElement.isInnerPoint(data)) {
           currentElement.emit("click", {
             type: "click",

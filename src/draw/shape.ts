@@ -1,6 +1,6 @@
 import { Element } from "./element";
-
-import { IPoint, pointInRegionCN } from "./utils";
+import { IPoint, pointInRegionWN } from "./utils";
+import _ from "lodash";
 
 export class Rectangle extends Element {
   constructor(
@@ -12,22 +12,24 @@ export class Rectangle extends Element {
     super();
   }
 
-  show() {
+  render() {
+    if (!this.visible) return;
     const ctx = this.gRender?.canvasCtx2D;
     if (!ctx) return;
     ctx.save();
-    ctx.strokeStyle = "rgb(200,0,0)";
-    ctx.strokeRect(
-      this.x,
-      this.y,
-      this.width,
-
-      this.height
-    );
+    const strokeStyle = this.style?.stroke?.toCanvasStrokeStyle(ctx);
+    if (strokeStyle) {
+      ctx.strokeStyle = strokeStyle;
+      ctx.lineWidth = this.style?.stroke?.width || 1;
+      ctx.strokeRect(this.x, this.y, this.width, this.height);
+    }
+    const fillStyle = this.style?.fill?.toCanvasFillStyle(ctx);
+    if (fillStyle) {
+      ctx.fillStyle = fillStyle;
+      ctx.fillRect(this.x, this.y, this.width, this.height);
+    }
     ctx.restore();
   }
-
-  hidden() {}
 
   isInnerPoint(point: IPoint): boolean {
     const pointList: IPoint[] = [
@@ -37,7 +39,7 @@ export class Rectangle extends Element {
       { x: this.x, y: this.y + this.height },
       { x: this.x, y: this.y },
     ];
-    return pointInRegionCN(point, pointList);
+    return pointInRegionWN(point, pointList);
   }
 }
 
@@ -50,18 +52,16 @@ export class Rectangle extends Element {
 //   ) {
 //     super();
 //   }
-//   show() {}
+//   render() {}
 
-//   hidden() {}
 // }
 
 // export class Polygon extends Element {
 //   constructor(public points: Array<{ x: number; y: number }>) {
 //     super();
 //   }
-//   show() {}
+//   render() {}
 
-//   hidden() {}
 // }
 
 // export class Line extends Element {
@@ -73,16 +73,12 @@ export class Rectangle extends Element {
 //   ) {
 //     super();
 //   }
-//   show() {}
-
-//   hidden() {}
+//   render() {}
 // }
 
 // export class Path extends Element {
 //   constructor(public path: string) {
 //     super();
 //   }
-//   show() {}
-
-//   hidden() {}
+//   render() {}
 // }
