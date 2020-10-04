@@ -5,9 +5,18 @@ export interface IGRenderEvent {
 }
 
 export interface IGRenderElementMouseEvent extends IGRenderEvent {
-  target: Element;
+  target?: Element;
+}
+
+export interface IGRenderResizeEvent extends IGRenderEvent {
+  target?: HTMLCanvasElement;
 }
 
 export interface IElementEventMap {
   click: IGRenderElementMouseEvent;
+}
+
+export interface IGRenderEventMap {
+  click: IGRenderElementMouseEvent;
+  resize: IGRenderResizeEvent;
 }

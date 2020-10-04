@@ -1,22 +1,32 @@
+import Color from "color";
 import EventEmitter from "eventemitter3";
 import ResizeObserver from "resize-observer-polyfill";
 
 import { Element } from "./element";
+import { IGRenderEventMap } from "./events";
+import { ColorParam } from "./style";
 import { IPoint, setupCanvas } from "./utils";
 
 export class GRender {
+  static init(container: HTMLElement) {
+    return new GRender(container);
+  }
+
   containerElement: HTMLElement;
   canvasElement: HTMLCanvasElement;
   canvasCtx2D: CanvasRenderingContext2D;
-  elements: Set<Element> = new Set();
-
-  private eventEmitter = new EventEmitter();
+  elements: Element[] = [];
+  eventEmitter = new EventEmitter();
+  backgroundColor: Color = new Color("#fff");
 
   private canvasResizeObserver = new ResizeObserver((entries) => {
     for (const entry of entries) {
-      if (entry.target === this.containerElement) {
+      if (entry.target === this.canvasElement) {
         this.resizeCanvas();
-        this.render();
+        this.eventEmitter.emit("resize", {
+          type: "resize",
+          target: this.canvasElement,
+        });
       }
     }
   });
@@ -27,7 +37,7 @@ export class GRender {
     this.canvasElement = document.createElement("canvas");
     this.canvasElement.setAttribute(
       "style",
-      `display: block; width: 100%; heigh: 100%`
+      `display: block; width: 100%; height: 100%`
     );
     this.containerElement.appendChild(this.canvasElement);
 
@@ -37,43 +47,58 @@ export class GRender {
 
     // canvas DOM 事件监听
     this.listenCanvasDomEvents();
-    // 自定义事件监听
-    this.listenCustomEvents();
+
     // resize 事件监听
     this.canvasResizeObserver.observe(this.canvasElement);
   }
 
-  resizeCanvas() {
-    const w = this.containerElement.clientWidth;
-    const h = this.containerElement.clientHeight;
+  setBackgroundColor(color: ColorParam) {
+    this.backgroundColor = new Color(color);
+  }
 
-    if (w !== this.canvasElement.width || h !== this.canvasElement.height) {
-      this.canvasCtx2D = setupCanvas(this.canvasElement)!;
-      this.canvasCtx2D.save();
-      this.canvasCtx2D.fillStyle = "rgb(228,228,228)";
-      this.canvasCtx2D.fillRect(0, 0, w, h);
-      this.canvasCtx2D.restore();
-    }
+  resizeCanvas() {
+    this.canvasCtx2D = setupCanvas(this.canvasElement)!;
   }
 
   render() {
-    this.elements.forEach((e) => e.render());
+    const rect = this.canvasElement.getBoundingClientRect();
+    this.canvasCtx2D.save();
+    this.canvasCtx2D.fillStyle = this.backgroundColor.string();
+    this.canvasCtx2D.fillRect(0, 0, rect.width, rect.height);
+    this.canvasCtx2D.restore();
+    for (let i = this.elements.length - 1; i >= 0; i--) {
+      const currentElement = this.elements[i];
+      currentElement.render();
+    }
   }
 
   add(element: Element) {
     element.gRender = this;
-    this.elements.add(element);
+    this.elements.unshift(element);
   }
 
   remove(element: Element) {
-    this.elements.delete(element);
-    this.render();
+    const index = this.elements.indexOf(element);
+    if (index !== -1) {
+      this.elements.splice(index, 1);
+    }
+  }
+
+  on<K extends keyof IGRenderEventMap>(
+    type: K,
+    listener: (ev: IGRenderEventMap[K]) => void
+  ): void {
+    this.eventEmitter.on(type, listener);
+  }
+
+  off<K extends keyof IGRenderEventMap>(
+    type: K,
+    listener: (ev: IGRenderEventMap[K]) => void
+  ): void {
+    this.eventEmitter.off(type, listener);
   }
 
   listenCanvasDomEvents() {
-    this.canvasElement.addEventListener("mousedown", () => {});
-    this.canvasElement.addEventListener("mousemove", () => {});
-    this.canvasElement.addEventListener("mouseup", () => {});
     this.canvasElement.addEventListener("click", (e) => {
       const s = this.canvasElement.getBoundingClientRect();
       let point: IPoint = {
@@ -81,14 +106,10 @@ export class GRender {
         y: e.clientY - s.y,
       };
       console.log(point);
-      this.eventEmitter.emit("click", point);
-    });
-  }
-
-  listenCustomEvents() {
-    this.eventEmitter.on("click", (data: IPoint) => {
+      let targetElement: Element | undefined;
       for (const currentElement of this.elements) {
-        if (currentElement.isInnerPoint(data)) {
+        if (currentElement.isInnerPoint(point)) {
+          targetElement = currentElement;
           currentElement.emit("click", {
             type: "click",
             target: currentElement,
@@ -96,6 +117,10 @@ export class GRender {
           break;
         }
       }
+      this.eventEmitter.emit("click", {
+        type: "click",
+        target: targetElement,
+      });
     });
   }
 }

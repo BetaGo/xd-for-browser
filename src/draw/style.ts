@@ -1,19 +1,30 @@
 import Color from "color";
 
-type ColorParam =
+export type ColorParam =
   | Color
   | string
   | ArrayLike<number>
   | number
   | { [key: string]: any };
 
+type StyleType = "solid" | "gradient" | "none" | undefined;
+
 export interface IStyle {
   fill?: FillStyle;
   stroke?: StrokeStyle;
 }
 
+export class Style {
+  fill: FillStyle;
+  stroke: StrokeStyle;
+  constructor() {
+    this.fill = new FillStyle();
+    this.stroke = new StrokeStyle();
+  }
+}
+
 export class FillStyle {
-  type?: string;
+  type: StyleType;
   color?: Color;
   gradient?: Gradient;
 
@@ -36,7 +47,7 @@ export class FillStyle {
 }
 
 export class StrokeStyle {
-  type?: string;
+  type: StyleType;
   color?: Color;
   gradient?: Gradient;
   width: number = 1;

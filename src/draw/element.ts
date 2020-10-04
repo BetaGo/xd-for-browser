@@ -1,12 +1,12 @@
 import EventEmitter from "eventemitter3";
 import { IElementEventMap } from "./events";
 import { GRender } from "./gRender";
-import { IStyle } from "./style";
+import { Style } from "./style";
 import { IPoint } from "./utils";
 
 export abstract class Element {
   visible: boolean = true;
-  style?: IStyle;
+  style: Style = new Style();
   transform: any;
   gRender?: GRender;
   eventEmitter = new EventEmitter();
@@ -45,6 +45,8 @@ export abstract class Element {
     this.visible = false;
   }
 
+  abstract update<T>(params: T): void;
   abstract render(): void;
   abstract isInnerPoint(point: IPoint): boolean;
+  abstract toJSON(): any;
 }

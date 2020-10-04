@@ -31,6 +31,8 @@ export class Rectangle extends Element {
     ctx.restore();
   }
 
+  update() {}
+
   isInnerPoint(point: IPoint): boolean {
     const pointList: IPoint[] = [
       { x: this.x, y: this.y },
@@ -40,6 +42,19 @@ export class Rectangle extends Element {
       { x: this.x, y: this.y },
     ];
     return pointInRegionWN(point, pointList);
+  }
+
+  toJSON() {
+    const d = {
+      x: this.x,
+      y: this.y,
+      width: this.width,
+      height: this.height,
+      visible: this.visible,
+      style: this.style,
+      transform: this.transform,
+    };
+    return d;
   }
 }
 

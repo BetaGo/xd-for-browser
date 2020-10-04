@@ -1,16 +1,21 @@
 import styled from "@emotion/styled";
-import React, { useState } from "react";
-import SelectIcon from "@spectrum-icons/workflow/Select";
-import RectangleIcon from "@spectrum-icons/workflow/Rectangle";
-import EllipseIcon from "@spectrum-icons/workflow/Ellipse";
-import PolygonIcon from "@spectrum-icons/workflow/Polygon";
-import LineIcon from "@spectrum-icons/workflow/Line";
-import VectorDrawIcon from "@spectrum-icons/workflow/VectorDraw";
-import TextIcon from "@spectrum-icons/workflow/Text";
 import ArtboardIcon from "@spectrum-icons/workflow/Artboard";
-import ZoomIcon from "@spectrum-icons/workflow/Search";
+import EllipseIcon from "@spectrum-icons/workflow/Ellipse";
 import LayersIcon from "@spectrum-icons/workflow/Layers";
+import LineIcon from "@spectrum-icons/workflow/Line";
 import AssetsIcon from "@spectrum-icons/workflow/PaddingTop";
+import PolygonIcon from "@spectrum-icons/workflow/Polygon";
+import RectangleIcon from "@spectrum-icons/workflow/Rectangle";
+import ZoomIcon from "@spectrum-icons/workflow/Search";
+import SelectIcon from "@spectrum-icons/workflow/Select";
+import TextIcon from "@spectrum-icons/workflow/Text";
+import VectorDrawIcon from "@spectrum-icons/workflow/VectorDraw";
+import { runInAction } from "mobx";
+import { observer } from "mobx-react";
+import React from "react";
+
+import { DesignTool, OtherTool } from "../constants";
+import { useStores } from "../hooks/useStores";
 
 const Root = styled.div`
   width: 48px;
@@ -35,38 +40,47 @@ const ToolItem = styled.div`
 const designToolsData = [
   {
     name: "Select",
+    value: DesignTool.Select,
     icon: <SelectIcon size="S" />,
   },
   {
     name: "Rectangle",
+    value: DesignTool.Rectangle,
     icon: <RectangleIcon size="S" />,
   },
   {
     name: "Ellipse",
+    value: DesignTool.Ellipse,
     icon: <EllipseIcon size="S" />,
   },
   {
     name: "Polygon",
+    value: DesignTool.Polygon,
     icon: <PolygonIcon size="S" />,
   },
   {
     name: "Line",
+    value: DesignTool.Line,
     icon: <LineIcon size="S" />,
   },
   {
     name: "Pen",
+    value: DesignTool.Pen,
     icon: <VectorDrawIcon size="S" />,
   },
   {
     name: "Text",
+    value: DesignTool.Text,
     icon: <TextIcon size="S" />,
   },
   {
     name: "Artboard",
+    value: DesignTool.Artboard,
     icon: <ArtboardIcon size="S" />,
   },
   {
     name: "Zoom",
+    value: DesignTool.Zoom,
     icon: <ZoomIcon size="S" />,
   },
 ];
@@ -74,26 +88,29 @@ const designToolsData = [
 const otherToolsData = [
   {
     name: "Assets",
+    value: OtherTool.Assets,
     icon: <AssetsIcon size="S" />,
   },
   {
     name: "Layers",
+    value: OtherTool.Layers,
     icon: <LayersIcon size="S" />,
   },
 ];
 
 const ToolBox = () => {
-  const [selectedDesignTool, setSelectedDesignTool] = useState("Select");
-  const [selectedOtherTool, setSelectedOtherTool] = useState("Select");
+  const { uiStore } = useStores();
   return (
     <Root>
       <div>
         {designToolsData.map((v) => (
           <ToolItem
             onClick={() => {
-              setSelectedDesignTool(v.name);
+              runInAction(() => {
+                uiStore.selectedDesignTool = v.value;
+              });
             }}
-            className={v.name === selectedDesignTool ? "active" : ""}
+            className={v.value === uiStore.selectedDesignTool ? "active" : ""}
             key={v.name}
           >
             {v.icon}
@@ -104,13 +121,15 @@ const ToolBox = () => {
         {otherToolsData.map((v) => (
           <ToolItem
             onClick={() => {
-              if (v.name === selectedOtherTool) {
-                setSelectedOtherTool("");
-              } else {
-                setSelectedOtherTool(v.name);
-              }
+              runInAction(() => {
+                if (v.value === uiStore.selectedOtherTool) {
+                  uiStore.selectedOtherTool = undefined;
+                } else {
+                  uiStore.selectedOtherTool = v.value;
+                }
+              });
             }}
-            className={v.name === selectedOtherTool ? "active" : ""}
+            className={v.value === uiStore.selectedOtherTool ? "active" : ""}
             key={v.name}
           >
             {v.icon}
@@ -121,4 +140,4 @@ const ToolBox = () => {
   );
 };
 
-export default ToolBox;
+export default observer(ToolBox);

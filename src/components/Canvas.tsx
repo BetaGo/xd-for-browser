@@ -1,47 +1,84 @@
 import styled from "@emotion/styled";
+import { runInAction } from "mobx";
 import React, { useEffect, useRef } from "react";
 
-import { GRender } from "../draw/gRender";
-import { Rectangle } from "../draw/shape";
-import { FillStyle, LinearGradient, StrokeStyle } from "../draw/style";
+import { useStores } from "../hooks/useStores";
+import Selection from "./controls/Selection";
 
 const Root = styled.div`
+  position: relative;
+  display: flex;
   flex: 1;
 `;
 
+const CanvasContainer = styled.div`
+  flex: 1;
+`;
+const OperationLayer = styled.div`
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+`;
+
 const Canvas = () => {
+  const { canvasStore, canvasMouseStore } = useStores();
   const canvasContainerRef = useRef<HTMLDivElement>(null);
-  const gRenderRef = useRef<GRender | null>(null);
+  const operationLayerRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
-    const gRender = new GRender(canvasContainerRef.current!);
-    gRenderRef.current = gRender;
-    const rect = new Rectangle(100, 100, 300, 200);
+    canvasStore.initRender(canvasContainerRef.current!);
+  }, [canvasStore]);
 
-    const fillStyle = new FillStyle();
-    fillStyle.setColor("#258");
-    fillStyle.type = "gradient";
-    const lg = new LinearGradient(200, 100, 200, 300);
-    lg.addColorStop(0, "#fff");
-    lg.addColorStop(1, "#000");
-    fillStyle.gradient = lg;
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      const rect = operationLayerRef.current!.getBoundingClientRect();
 
-    const strokeStyle = new StrokeStyle();
-    strokeStyle.type = "solid";
-    strokeStyle.width = 2;
-    strokeStyle.setColor("#36d");
-    rect.style = {
-      stroke: strokeStyle,
-      fill: fillStyle,
+      runInAction(() => {
+        canvasMouseStore.currentMouseX = e.clientX - rect.x;
+        canvasMouseStore.currentMouseY = e.clientY - rect.y;
+      });
     };
+    const handleMouseUp = (e: MouseEvent) => {
+      const rect = operationLayerRef.current!.getBoundingClientRect();
+      runInAction(() => {
+        canvasMouseStore.isMouseDown = false;
+        canvasMouseStore.isMouseUp = true;
+        canvasMouseStore.mouseUpX = e.clientX - rect.x;
+        canvasMouseStore.mouseUpY = e.clientY - rect.y;
+      });
+    };
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
 
-    rect.on("click", (e) => {
-      console.log(e);
-    });
-    gRender.add(rect);
-    gRender.render();
-  }, []);
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [canvasMouseStore]);
 
-  return <Root ref={canvasContainerRef}></Root>;
+  return (
+    <Root>
+      <CanvasContainer
+        onMouseDown={(e) => {
+          const rect = operationLayerRef.current!.getBoundingClientRect();
+          runInAction(() => {
+            canvasMouseStore.isMouseDown = true;
+            canvasMouseStore.isMouseUp = false;
+            canvasMouseStore.mouseDownX = e.clientX - rect.x;
+            canvasMouseStore.mouseDownY = e.clientY - rect.y;
+          });
+        }}
+        ref={canvasContainerRef}
+      ></CanvasContainer>
+      <OperationLayer ref={operationLayerRef}>
+        <Selection></Selection>
+      </OperationLayer>
+    </Root>
+  );
 };
 
 export default Canvas;
