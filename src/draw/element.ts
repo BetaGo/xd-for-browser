@@ -4,6 +4,13 @@ import { GRender } from "./gRender";
 import { Style } from "./style";
 import { IPoint } from "./utils";
 
+export interface IBoundingRect {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 export abstract class Element {
   visible: boolean = true;
   style: Style = new Style();
@@ -49,4 +56,6 @@ export abstract class Element {
   abstract render(): void;
   abstract isInnerPoint(point: IPoint): boolean;
   abstract toJSON(): any;
+  abstract getBoundingRect(): IBoundingRect;
+  abstract updatePosition(point: IPoint): void;
 }

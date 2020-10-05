@@ -1,18 +1,18 @@
-import styled from "@emotion/styled";
 import HomeIcon from "@spectrum-icons/workflow/Home";
 import React from "react";
 import { NavLink } from "react-router-dom";
 
+import styled from "../styles/styled";
 import Menu from "./Menu";
 
 const Root = styled.div`
+  cursor: pointer;
   width: 100%;
   height: 40px;
   font-size: 13px;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: auto;
-  color: rgba(0, 0, 0, 0.6);
 `;
 
 const LeftActions = styled.div`
@@ -48,7 +48,7 @@ const RightActions = styled.div`
 `;
 
 const NavItem = styled(NavLink)`
-  color: rgba(0, 0, 0, 0.5);
+  color: ${({ theme }) => theme.palette.text.label};
   position: relative;
   height: 100%;
   box-sizing: border-box;
@@ -56,7 +56,7 @@ const NavItem = styled(NavLink)`
   line-height: 40px;
 
   &.active {
-    color: #000;
+    color: ${({ theme }) => theme.palette.text.primary};
   }
   &.active::before {
     content: " ";
@@ -66,7 +66,7 @@ const NavItem = styled(NavLink)`
     bottom: 0;
     height: 2px;
     width: 100%;
-    background: #000;
+    background: ${({ theme }) => theme.palette.text.primary};
   }
 `;
 

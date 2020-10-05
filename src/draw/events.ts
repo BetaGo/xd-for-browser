@@ -6,6 +6,7 @@ export interface IGRenderEvent {
 
 export interface IGRenderElementMouseEvent extends IGRenderEvent {
   target?: Element;
+  browserMouseEvent: MouseEvent;
 }
 
 export interface IGRenderResizeEvent extends IGRenderEvent {
@@ -14,9 +15,15 @@ export interface IGRenderResizeEvent extends IGRenderEvent {
 
 export interface IElementEventMap {
   click: IGRenderElementMouseEvent;
+  mousedown: IGRenderElementMouseEvent;
+  mouseup: IGRenderElementMouseEvent;
+  mousemove: IGRenderElementMouseEvent;
 }
 
 export interface IGRenderEventMap {
   click: IGRenderElementMouseEvent;
+  mousedown: IGRenderElementMouseEvent;
+  mouseup: IGRenderElementMouseEvent;
+  mousemove: IGRenderElementMouseEvent;
   resize: IGRenderResizeEvent;
 }

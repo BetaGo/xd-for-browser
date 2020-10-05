@@ -1,8 +1,8 @@
-import styled from "@emotion/styled";
-import { runInAction } from "mobx";
 import React, { useEffect, useRef } from "react";
 
 import { useStores } from "../hooks/useStores";
+import styled from "../styles/styled";
+import ResizeAndRotate from "./controls/ResizeAndRotate";
 import Selection from "./controls/Selection";
 
 const Root = styled.div`
@@ -34,27 +34,38 @@ const Canvas = () => {
   }, [canvasStore]);
 
   useEffect(() => {
+    let mouseMoveDetectTimer: ReturnType<typeof setTimeout>;
     const handleMouseMove = (e: MouseEvent) => {
       const rect = operationLayerRef.current!.getBoundingClientRect();
 
-      runInAction(() => {
-        canvasMouseStore.currentMouseX = e.clientX - rect.x;
-        canvasMouseStore.currentMouseY = e.clientY - rect.y;
+      canvasMouseStore.update({
+        isMouseMoving: true,
+        currentMouseX: e.clientX - rect.x,
+        currentMouseY: e.clientY - rect.y,
       });
+      mouseMoveDetectTimer && clearTimeout(mouseMoveDetectTimer);
+      mouseMoveDetectTimer = setTimeout(() => {
+        canvasMouseStore.update({
+          isMouseMoving: false,
+        });
+      }, 500);
     };
     const handleMouseUp = (e: MouseEvent) => {
       const rect = operationLayerRef.current!.getBoundingClientRect();
-      runInAction(() => {
-        canvasMouseStore.isMouseDown = false;
-        canvasMouseStore.isMouseUp = true;
-        canvasMouseStore.mouseUpX = e.clientX - rect.x;
-        canvasMouseStore.mouseUpY = e.clientY - rect.y;
+
+      canvasMouseStore.update({
+        isMouseDown: false,
+        isMouseMoving: false,
+        mouseButton: e.button,
+        mouseUpX: e.clientX - rect.x,
+        mouseUpY: e.clientY - rect.y,
       });
     };
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("mouseup", handleMouseUp);
 
     return () => {
+      mouseMoveDetectTimer && clearTimeout(mouseMoveDetectTimer);
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseup", handleMouseUp);
     };
@@ -65,17 +76,19 @@ const Canvas = () => {
       <CanvasContainer
         onMouseDown={(e) => {
           const rect = operationLayerRef.current!.getBoundingClientRect();
-          runInAction(() => {
-            canvasMouseStore.isMouseDown = true;
-            canvasMouseStore.isMouseUp = false;
-            canvasMouseStore.mouseDownX = e.clientX - rect.x;
-            canvasMouseStore.mouseDownY = e.clientY - rect.y;
+          canvasMouseStore.update({
+            isMouseDown: true,
+            isMouseMoving: false,
+            mouseButton: e.button,
+            mouseDownX: e.clientX - rect.x,
+            mouseDownY: e.clientY - rect.y,
           });
         }}
         ref={canvasContainerRef}
       ></CanvasContainer>
       <OperationLayer ref={operationLayerRef}>
         <Selection></Selection>
+        <ResizeAndRotate></ResizeAndRotate>
       </OperationLayer>
     </Root>
   );

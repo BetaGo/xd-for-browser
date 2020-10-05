@@ -98,28 +98,40 @@ export class GRender {
     this.eventEmitter.off(type, listener);
   }
 
-  listenCanvasDomEvents() {
-    this.canvasElement.addEventListener("click", (e) => {
-      const s = this.canvasElement.getBoundingClientRect();
-      let point: IPoint = {
-        x: e.clientX - s.x,
-        y: e.clientY - s.y,
-      };
-      console.log(point);
-      let targetElement: Element | undefined;
-      for (const currentElement of this.elements) {
-        if (currentElement.isInnerPoint(point)) {
-          targetElement = currentElement;
-          currentElement.emit("click", {
-            type: "click",
-            target: currentElement,
-          });
-          break;
-        }
+  getElementFromPoint(point: IPoint): Element | undefined {
+    for (const currentElement of this.elements) {
+      if (currentElement.isInnerPoint(point)) {
+        return currentElement;
       }
-      this.eventEmitter.emit("click", {
-        type: "click",
-        target: targetElement,
+    }
+  }
+
+  listenCanvasDomEvents() {
+    const mouseEventList: Array<
+      keyof Pick<
+        HTMLElementEventMap,
+        "click" | "mousedown" | "mouseup" | "mousemove"
+      >
+    > = ["click", "mousedown", "mouseup", "mousemove"];
+    mouseEventList.forEach((eventType) => {
+      this.canvasElement.addEventListener(eventType, (e) => {
+        const s = this.canvasElement.getBoundingClientRect();
+        let point: IPoint = {
+          x: e.clientX - s.x,
+          y: e.clientY - s.y,
+        };
+
+        let targetElement = this.getElementFromPoint(point);
+        targetElement?.emit(eventType, {
+          type: eventType,
+          target: targetElement,
+          browserMouseEvent: e,
+        });
+        this.eventEmitter.emit(eventType, {
+          type: eventType,
+          target: targetElement,
+          browserMouseEvent: e,
+        });
       });
     });
   }

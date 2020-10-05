@@ -4,7 +4,6 @@ import { useStores } from "../hooks/useStores";
 
 const PropertyEditor = () => {
   const { canvasStore } = useStores();
-  console.log(canvasStore.selectedElement);
   return (
     <div>
       <pre>{JSON.stringify(canvasStore.selectedElement, null, 2)}</pre>

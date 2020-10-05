@@ -31,16 +31,13 @@ reaction(
 
     if (!creatingRect) {
       creatingRect = new Rectangle(x, y, width, height);
+
       creatingRect.style.fill.type = "solid";
       creatingRect.style.fill.setColor("#fff");
       creatingRect.style.stroke.setColor("#707070");
       creatingRect.style.stroke.type = "solid";
-      creatingRect.on("click", (e) => {
-        runInAction(() => {
-          canvasStore.selectedElement = e.target;
-        });
-      });
       canvasStore.gRender?.add(creatingRect);
+      canvasStore.selectedElement = creatingRect;
     } else {
       creatingRect.x = x;
       creatingRect.y = y;

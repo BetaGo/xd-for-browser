@@ -19,6 +19,7 @@
     "@types/react-dom": "^16.9.8",
     "@types/react-router-dom": "^5.1.5",
     "color": "^3.1.2",
+    "emotion-theming": "^10.0.27",
     "eventemitter3": "^4.0.7",
     "jszip": "^3.5.0",
     "keyboardjs": "^2.6.4",

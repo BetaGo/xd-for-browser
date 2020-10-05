@@ -81,14 +81,11 @@ export function listenKeyboardEvents() {
 
   keyboardJS.bind("ctrl + n", (e) => {
     e?.preventDefault();
-    alert("c + n");
-    console.log("ctrl + n");
-    // window.open(window.location.origin);
+    window.open(window.location.origin);
   });
 
   keyboardJS.bind("ctrl + o", (e) => {
     e?.preventDefault();
-    alert("c + o");
     runInAction(() => {
       globalStores.projectStore.loadXDFile();
     });

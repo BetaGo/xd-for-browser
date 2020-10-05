@@ -1,5 +1,9 @@
-import { defaultTheme, Divider, Provider } from "@adobe/react-spectrum";
-import styled from "@emotion/styled";
+import {
+  defaultTheme as spectrumDefaultTheme,
+  Divider,
+  Provider,
+} from "@adobe/react-spectrum";
+import { ThemeProvider } from "emotion-theming";
 import React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
@@ -8,6 +12,8 @@ import Header from "./components/Header";
 import PropertyEditor from "./components/PropertyEditor";
 import ToolBox from "./components/ToolBox";
 import Home from "./pages/Home";
+import styled from "./styles/styled";
+import { defaultTheme } from "./styles/theme";
 
 const GridRoot = styled.div`
   width: 100%;
@@ -51,34 +57,42 @@ const PropertyEditorGridItem = styled.div`
 
 function App() {
   return (
-    <Provider theme={defaultTheme} width="100%" height="100%" locale="en-US">
-      <Router>
-        <Switch>
-          <Route exact path="/">
-            <Home />
-          </Route>
-          <Route>
-            <GridRoot>
-              <HeaderGridItem>
-                <Header />
-                <Divider size="M" />
-              </HeaderGridItem>
-              <ToolBoxGridItem>
-                <ToolBox />
-                <Divider orientation="vertical" size="M" />
-              </ToolBoxGridItem>
-              <CanvasGridItem>
-                <Canvas />
-              </CanvasGridItem>
-              <PropertyEditorGridItem>
-                <Divider orientation="vertical" size="M" />
-                <PropertyEditor />
-              </PropertyEditorGridItem>
-            </GridRoot>
-          </Route>
-        </Switch>
-      </Router>
-    </Provider>
+    <ThemeProvider theme={defaultTheme}>
+      <Provider
+        theme={spectrumDefaultTheme}
+        width="100%"
+        height="100%"
+        locale="en-US"
+        colorScheme="light"
+      >
+        <Router>
+          <Switch>
+            <Route exact path="/">
+              <Home />
+            </Route>
+            <Route>
+              <GridRoot>
+                <HeaderGridItem>
+                  <Header />
+                  <Divider size="M" />
+                </HeaderGridItem>
+                <ToolBoxGridItem>
+                  <ToolBox />
+                  <Divider orientation="vertical" size="M" />
+                </ToolBoxGridItem>
+                <CanvasGridItem>
+                  <Canvas />
+                </CanvasGridItem>
+                <PropertyEditorGridItem>
+                  <Divider orientation="vertical" size="M" />
+                  <PropertyEditor />
+                </PropertyEditorGridItem>
+              </GridRoot>
+            </Route>
+          </Switch>
+        </Router>
+      </Provider>
+    </ThemeProvider>
   );
 }
 

@@ -33,6 +33,11 @@ export class Rectangle extends Element {
 
   update() {}
 
+  updatePosition(point: IPoint) {
+    this.x = point.x;
+    this.y = point.y;
+  }
+
   isInnerPoint(point: IPoint): boolean {
     const pointList: IPoint[] = [
       { x: this.x, y: this.y },
@@ -55,6 +60,15 @@ export class Rectangle extends Element {
       transform: this.transform,
     };
     return d;
+  }
+
+  getBoundingRect() {
+    return {
+      x: this.x,
+      y: this.y,
+      width: this.width,
+      height: this.height,
+    };
   }
 }
 

@@ -14,3 +14,11 @@ export enum OtherTool {
   Assets,
   Layers,
 }
+
+export enum MouseEventButton {
+  Main,
+  Auxiliary,
+  Secondary,
+  Fourth,
+  Fifth,
+}

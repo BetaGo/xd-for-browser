@@ -1,5 +1,6 @@
-import { makeObservable, observable, runInAction } from "mobx";
+import { computed, makeObservable, observable, runInAction } from "mobx";
 
+import { MouseEventButton } from "../constants";
 import { Element } from "../draw/element";
 import { GRender } from "../draw/gRender";
 import { Rectangle } from "../draw/shape";
@@ -19,10 +20,12 @@ export class CanvasStore {
     this.gRender = GRender.init(element);
     this.gRender.setBackgroundColor("rgb(228,228,228)");
 
-    this.gRender.on("click", (e) => {
-      runInAction(() => {
-        this.selectedElement = e.target;
-      });
+    this.gRender.on("mousedown", (e) => {
+      if (e.browserMouseEvent.button === MouseEventButton.Main) {
+        runInAction(() => {
+          this.selectedElement = e.target;
+        });
+      }
     });
 
     this.gRender.on("resize", (e) => {

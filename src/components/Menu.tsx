@@ -1,10 +1,10 @@
 import { Divider } from "@adobe/react-spectrum";
-import styled from "@emotion/styled";
 import ShowMenuIcon from "@spectrum-icons/workflow/ShowMenu";
 import { observer } from "mobx-react";
 import React from "react";
 
 import { useStores } from "../hooks/useStores";
+import styled from "../styles/styled";
 
 const MenuDrawerRoot = styled.div`
   display: ${(props) => (props.hidden ? "none" : "block")};
@@ -28,8 +28,8 @@ const MenuDrawer = styled.div`
   left: 0;
   height: 100%;
   font-size: 12px;
-  color: #000;
-  background-color: #fff;
+  /* color: #000; */
+  background-color: ${({ theme }) => theme.palette.background.default};
 `;
 
 const ListRoot = styled.div`
@@ -48,7 +48,7 @@ const ListItem = styled.div`
   padding: 0 15px;
 
   &:hover {
-    background-color: rgb(245, 245, 245);
+    background-color: ${({ theme }) => theme.palette.background.hover};
   }
 `;
 
