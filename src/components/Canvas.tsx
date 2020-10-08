@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from "react";
 
 import { useStores } from "../hooks/useStores";
 import styled from "../styles/styled";
+import PositionTip from "./controls/PositionTip";
 import ResizeAndRotate from "./controls/ResizeAndRotate";
 import Selection from "./controls/Selection";
 
@@ -11,9 +12,6 @@ const Root = styled.div`
   flex: 1;
 `;
 
-const CanvasContainer = styled.div`
-  flex: 1;
-`;
 const OperationLayer = styled.div`
   pointer-events: none;
   position: absolute;
@@ -31,6 +29,7 @@ const Canvas = () => {
 
   useEffect(() => {
     canvasStore.initRender(canvasContainerRef.current!);
+    canvasMouseStore.containerDomElement = canvasContainerRef.current!;
   }, [canvasStore]);
 
   useEffect(() => {
@@ -72,23 +71,23 @@ const Canvas = () => {
   }, [canvasMouseStore]);
 
   return (
-    <Root>
-      <CanvasContainer
-        onMouseDown={(e) => {
-          const rect = operationLayerRef.current!.getBoundingClientRect();
-          canvasMouseStore.update({
-            isMouseDown: true,
-            isMouseMoving: false,
-            mouseButton: e.button,
-            mouseDownX: e.clientX - rect.x,
-            mouseDownY: e.clientY - rect.y,
-          });
-        }}
-        ref={canvasContainerRef}
-      ></CanvasContainer>
+    <Root
+      onMouseDown={(e) => {
+        const rect = operationLayerRef.current!.getBoundingClientRect();
+        canvasMouseStore.update({
+          isMouseDown: true,
+          isMouseMoving: false,
+          mouseButton: e.button,
+          mouseDownX: e.clientX - rect.x,
+          mouseDownY: e.clientY - rect.y,
+        });
+      }}
+      ref={canvasContainerRef}
+    >
       <OperationLayer ref={operationLayerRef}>
         <Selection></Selection>
-        <ResizeAndRotate></ResizeAndRotate>
+        {/* <ResizeAndRotate></ResizeAndRotate> */}
+        <PositionTip />
       </OperationLayer>
     </Root>
   );

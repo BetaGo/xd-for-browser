@@ -1,8 +1,59 @@
-import { Element } from "./element";
-import { IPoint, pointInRegionWN } from "./utils";
+import { inv, multiply } from "mathjs";
 import _ from "lodash";
 
+import { Element } from "./element";
+import { IPoint, pointInRegionWN, Vec3 } from "./utils";
+import { Transform } from "./transform";
+
+export class BoundingBox {
+  constructor(
+    public x: number,
+    public y: number,
+    public width: number,
+    public height: number,
+    public transform: Transform = new Transform()
+  ) {}
+
+  getTransformed() {
+    const a: Vec3 = [this.x, this.y, 1];
+    const b: Vec3 = [this.x + this.width, this.y, 1];
+    const c: Vec3 = [this.x + this.width, this.y + this.height, 1];
+    const d: Vec3 = [this.x, this.y + this.height, 1];
+
+    const transformMatrix = this.transform.toMatrix();
+    const ta = multiply(transformMatrix, a).toArray() as Vec3;
+    const tb = multiply(transformMatrix, b).toArray() as Vec3;
+    const tc = multiply(transformMatrix, c).toArray() as Vec3;
+    const td = multiply(transformMatrix, d).toArray() as Vec3;
+
+    const x = Math.min(ta[0], tb[0], tc[0], td[0]);
+    const y = Math.min(ta[1], tb[1], tc[1], td[1]);
+
+    const width = ((ta[0] - tb[0]) ** 2 + (ta[1] - tb[1]) ** 2) ** 0.5;
+    const height = ((ta[0] - td[0]) ** 2 + (ta[1] - td[1]) ** 2) ** 0.5;
+    const rotate = (Math.asin(this.transform.b) * 180) / Math.PI;
+
+    // const eX = multiply(transformMatrix, [1, 0, 1]);
+    // const eY = multiply(transformMatrix, [0, 1, 1]);
+
+    const newRect = {
+      x,
+      y,
+      width,
+      height,
+      rotate,
+    };
+
+    return newRect;
+  }
+}
+
 export class Rectangle extends Element {
+  static autoNameCount: number = 0;
+
+  type: string;
+  private _name: string = "";
+
   constructor(
     public x: number,
     public y: number,
@@ -10,6 +61,18 @@ export class Rectangle extends Element {
     public height: number
   ) {
     super();
+    this.type = "shape";
+  }
+
+  get name() {
+    if (!this._name) {
+      this._name = `Rectangle ${++Rectangle.autoNameCount}`;
+    }
+    return this._name;
+  }
+
+  set name(name: string) {
+    this._name = name;
   }
 
   render() {
@@ -17,17 +80,26 @@ export class Rectangle extends Element {
     const ctx = this.gRender?.canvasCtx2D;
     if (!ctx) return;
     ctx.save();
-    const strokeStyle = this.style?.stroke?.toCanvasStrokeStyle(ctx);
+    ctx.transform(
+      this.transform.a,
+      this.transform.b,
+      this.transform.c,
+      this.transform.d,
+      this.transform.tx,
+      this.transform.ty
+    );
+    const strokeStyle = this.style?.stroke?.toCanvasStrokeStyle(ctx, this);
     if (strokeStyle) {
       ctx.strokeStyle = strokeStyle;
       ctx.lineWidth = this.style?.stroke?.width || 1;
       ctx.strokeRect(this.x, this.y, this.width, this.height);
     }
-    const fillStyle = this.style?.fill?.toCanvasFillStyle(ctx);
+    const fillStyle = this.style?.fill?.toCanvasFillStyle(ctx, this);
     if (fillStyle) {
       ctx.fillStyle = fillStyle;
       ctx.fillRect(this.x, this.y, this.width, this.height);
     }
+
     ctx.restore();
   }
 
@@ -39,6 +111,13 @@ export class Rectangle extends Element {
   }
 
   isInnerPoint(point: IPoint): boolean {
+    const v: Vec3 = [point.x, point.y, 1];
+    const invTransform = inv(this.transform.toMatrix());
+    const res = multiply(invTransform, v);
+    const p: IPoint = {
+      x: res.get([0]),
+      y: res.get([1]),
+    };
     const pointList: IPoint[] = [
       { x: this.x, y: this.y },
       { x: this.x + this.width, y: this.y },
@@ -46,11 +125,13 @@ export class Rectangle extends Element {
       { x: this.x, y: this.y + this.height },
       { x: this.x, y: this.y },
     ];
-    return pointInRegionWN(point, pointList);
+    return pointInRegionWN(p, pointList);
   }
 
   toJSON() {
     const d = {
+      name: this.name,
+      type: this.type,
       x: this.x,
       y: this.y,
       width: this.width,
@@ -62,13 +143,15 @@ export class Rectangle extends Element {
     return d;
   }
 
-  getBoundingRect() {
-    return {
-      x: this.x,
-      y: this.y,
-      width: this.width,
-      height: this.height,
-    };
+  getBoundingBox() {
+    const boundingBox = new BoundingBox(
+      this.x,
+      this.y,
+      this.width,
+      this.height,
+      _.clone(this.transform)
+    );
+    return boundingBox;
   }
 }
 

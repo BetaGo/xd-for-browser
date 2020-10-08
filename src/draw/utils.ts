@@ -3,6 +3,9 @@ export interface IPoint {
   y: number;
 }
 
+export type Vec2 = [number, number];
+export type Vec3 = [number, number, number];
+
 export function setupCanvas(canvas: HTMLCanvasElement) {
   const dpr = window.devicePixelRatio || 1;
   const rect = canvas.getBoundingClientRect();

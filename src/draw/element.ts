@@ -1,20 +1,16 @@
 import EventEmitter from "eventemitter3";
+
 import { IElementEventMap } from "./events";
 import { GRender } from "./gRender";
+import { BoundingBox } from "./shape";
 import { Style } from "./style";
+import { Transform } from "./transform";
 import { IPoint } from "./utils";
-
-export interface IBoundingRect {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
 
 export abstract class Element {
   visible: boolean = true;
   style: Style = new Style();
-  transform: any;
+  transform: Transform = new Transform();
   gRender?: GRender;
   eventEmitter = new EventEmitter();
 
@@ -52,10 +48,13 @@ export abstract class Element {
     this.visible = false;
   }
 
+  abstract name: string;
+  abstract type: string;
+
   abstract update<T>(params: T): void;
   abstract render(): void;
   abstract isInnerPoint(point: IPoint): boolean;
   abstract toJSON(): any;
-  abstract getBoundingRect(): IBoundingRect;
+  abstract getBoundingBox(): BoundingBox;
   abstract updatePosition(point: IPoint): void;
 }

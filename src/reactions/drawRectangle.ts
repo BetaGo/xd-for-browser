@@ -30,17 +30,19 @@ reaction(
     const height = Math.abs(mouseDownY! - currentMouseY);
 
     if (!creatingRect) {
-      creatingRect = new Rectangle(x, y, width, height);
+      creatingRect = new Rectangle(0, 0, width, height);
 
       creatingRect.style.fill.type = "solid";
       creatingRect.style.fill.setColor("#fff");
       creatingRect.style.stroke.setColor("#707070");
       creatingRect.style.stroke.type = "solid";
+      creatingRect.transform.tx = x;
+      creatingRect.transform.ty = y;
       canvasStore.gRender?.add(creatingRect);
       canvasStore.selectedElement = creatingRect;
     } else {
-      creatingRect.x = x;
-      creatingRect.y = y;
+      creatingRect.transform.tx = x;
+      creatingRect.transform.ty = y;
       creatingRect.width = width;
       creatingRect.height = height;
     }

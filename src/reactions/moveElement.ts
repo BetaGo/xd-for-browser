@@ -2,11 +2,11 @@ import { reaction } from "mobx";
 
 import { DesignTool, MouseEventButton } from "../constants";
 import { globalStores } from "../contexts";
-import { IBoundingRect } from "../draw/element";
+import { BoundingBox } from "../draw/shape";
 
 const { uiStore, canvasStore, canvasMouseStore } = globalStores;
 
-let elementRect: IBoundingRect | null = null;
+let elementBoundingBox: BoundingBox | null = null;
 
 reaction(
   () => {
@@ -28,7 +28,7 @@ reaction(
       !d.selectedElement ||
       d.mouseButton !== MouseEventButton.Main
     ) {
-      elementRect = null;
+      elementBoundingBox = null;
       return;
     }
 
@@ -39,20 +39,18 @@ reaction(
       currentMouseY,
       selectedElement,
     } = d;
-    if (!elementRect) {
-      elementRect = selectedElement.getBoundingRect();
+    if (!elementBoundingBox) {
+      elementBoundingBox = selectedElement.getBoundingBox();
     }
 
-    const dx = mouseDownX! - elementRect.x;
-    const dy = mouseDownY! - elementRect.y;
+    const dx = mouseDownX! - elementBoundingBox.transform.tx;
+    const dy = mouseDownY! - elementBoundingBox.transform.ty;
 
     const targetX = currentMouseX - dx;
     const targetY = currentMouseY - dy;
 
-    selectedElement.updatePosition({
-      x: targetX,
-      y: targetY,
-    });
+    selectedElement.transform.tx = targetX;
+    selectedElement.transform.ty = targetY;
 
     canvasStore.render();
   }

@@ -1,4 +1,8 @@
 import Color from "color";
+import { multiply } from "mathjs";
+
+import { Element } from "./element";
+import { Transform } from "./transform";
 
 export type ColorParam =
   | Color
@@ -33,11 +37,17 @@ export class FillStyle {
   }
 
   toCanvasFillStyle(
-    ctx: CanvasRenderingContext2D
+    ctx: CanvasRenderingContext2D,
+    element: Element
   ): CanvasFillStrokeStyles["fillStyle"] | undefined {
     switch (this.type) {
       case "gradient":
-        return this.gradient?.toCanvasGradient(ctx);
+        const boundingBox = element.getBoundingBox();
+        const { width, height } = boundingBox.getTransformed();
+        const transform = new Transform();
+        transform.a = width;
+        transform.d = height;
+        return this.gradient?.toCanvasGradient(ctx, transform);
       case "solid":
         return this.color?.string();
       case "none":
@@ -57,11 +67,17 @@ export class StrokeStyle {
   }
 
   toCanvasStrokeStyle(
-    ctx: CanvasRenderingContext2D
+    ctx: CanvasRenderingContext2D,
+    element: Element
   ): CanvasFillStrokeStyles["strokeStyle"] | undefined {
     switch (this.type) {
       case "gradient":
-        return this.gradient?.toCanvasGradient(ctx);
+        const boundingBox = element.getBoundingBox();
+        const { width, height } = boundingBox.getTransformed();
+        const transform = new Transform();
+        transform.a = width;
+        transform.d = height;
+        return this.gradient?.toCanvasGradient(ctx, transform);
       case "solid":
         return this.color?.string();
       case "none":
@@ -84,7 +100,10 @@ export abstract class Gradient {
     });
   }
 
-  abstract toCanvasGradient(ctx: CanvasRenderingContext2D): CanvasGradient;
+  abstract toCanvasGradient(
+    ctx: CanvasRenderingContext2D,
+    transform?: Transform
+  ): CanvasGradient;
 }
 
 export class LinearGradient extends Gradient {
@@ -97,8 +116,22 @@ export class LinearGradient extends Gradient {
     super();
   }
 
-  toCanvasGradient(ctx: CanvasRenderingContext2D) {
-    const lg = ctx.createLinearGradient(this.x1, this.y1, this.x2, this.y2);
+  toCanvasGradient(ctx: CanvasRenderingContext2D, transform?: Transform) {
+    let { x1, y1, x2, y2 } = this;
+
+    if (transform) {
+      [x1, y1] = multiply(transform.toMatrix(), [
+        x1,
+        y1,
+        1,
+      ]).toArray() as number[];
+      [x2, y2] = multiply(transform.toMatrix(), [
+        x2,
+        y2,
+        1,
+      ]).toArray() as number[];
+    }
+    const lg = ctx.createLinearGradient(x1, y1, x2, y2);
     this.stops.forEach((s) => {
       lg.addColorStop(s.offset, s.color.string());
     });
