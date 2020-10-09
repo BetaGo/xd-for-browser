@@ -2,9 +2,9 @@ import React, { useEffect, useRef } from "react";
 
 import { useStores } from "../hooks/useStores";
 import styled from "../styles/styled";
-import PositionTip from "./controls/PositionTip";
-import ResizeAndRotate from "./controls/ResizeAndRotate";
-import Selection from "./controls/Selection";
+import PositionTip from "./canvas-controls/PositionTip";
+import ResizeAndRotate from "./canvas-controls/ResizeAndRotate";
+import Selection from "./canvas-controls/Selection";
 
 const Root = styled.div`
   position: relative;
@@ -30,7 +30,7 @@ const Canvas = () => {
   useEffect(() => {
     canvasStore.initRender(canvasContainerRef.current!);
     canvasMouseStore.containerDomElement = canvasContainerRef.current!;
-  }, [canvasStore]);
+  }, [canvasMouseStore, canvasStore]);
 
   useEffect(() => {
     let mouseMoveDetectTimer: ReturnType<typeof setTimeout>;
@@ -86,7 +86,7 @@ const Canvas = () => {
     >
       <OperationLayer ref={operationLayerRef}>
         <Selection></Selection>
-        {/* <ResizeAndRotate></ResizeAndRotate> */}
+        <ResizeAndRotate></ResizeAndRotate>
         <PositionTip />
       </OperationLayer>
     </Root>

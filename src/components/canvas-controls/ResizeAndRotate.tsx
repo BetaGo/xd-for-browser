@@ -1,8 +1,10 @@
 import { observer } from "mobx-react";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
-import { BoundingBox } from "../../draw/shape";
-import { Transform } from "../../draw/transform";
+import { Element } from "../../draw/element";
+import { IElementEvent } from "../../draw/events";
+import { IBoundingRect } from "../../draw/shape";
+import { radian2Degree } from "../../draw/utils";
 import { useStores } from "../../hooks/useStores";
 import styled from "../../styles/styled";
 
@@ -106,58 +108,40 @@ const ControlPoint = styled.div<{ resizeEdge: ResizeEdge }>`
   } */
 `;
 
+const calculateBoundingRect = (element: Element): IBoundingRect => {
+  const currentBoundingBox = element.getBoundingBox();
+  const t = currentBoundingBox.getTransformed();
+  const boundingRect: IBoundingRect = {
+    x: currentBoundingBox.transform.tx + currentBoundingBox.x,
+    y: currentBoundingBox.transform.ty + currentBoundingBox.y,
+    rotate: Math.asin(currentBoundingBox.transform.b),
+    width: t.width,
+    height: t.height,
+  };
+  return boundingRect;
+};
+
 const ResizeAndRotate = () => {
   const { canvasStore, canvasMouseStore } = useStores();
-  const initialBoundingBoxRef = useRef<BoundingBox | null>(null);
   const selectedEdgeRef = useRef<ResizeEdge | null>(null);
 
   const { selectedElement } = canvasStore;
-  const {
-    isMainButtonDown,
-    isMouseMoving,
-    mouseDownX,
-    mouseDownY,
-    currentMouseX,
-    currentMouseY,
-    mouseButton,
-  } = canvasMouseStore;
+  const [boundingRect, setBoundingRect] = useState<IBoundingRect | undefined>();
 
   useEffect(() => {
-    if (!selectedElement || !isMainButtonDown) {
-      initialBoundingBoxRef.current = null;
-    } else {
-      initialBoundingBoxRef.current = selectedElement.getBoundingBox();
+    const handleBoundingChange = (e: IElementEvent) => {
+      setBoundingRect(calculateBoundingRect(e.target));
+    };
+    if (selectedElement) {
+      setBoundingRect(calculateBoundingRect(selectedElement));
+      selectedElement.on("boundingChange", handleBoundingChange);
+      return () => {
+        selectedElement.off("boundingChange", handleBoundingChange);
+      };
     }
-  }, [selectedElement, isMainButtonDown]);
+  }, [selectedElement]);
 
   if (!selectedElement) return null;
-  const boundingBox = selectedElement.getBoundingBox();
-  if (!boundingBox.width && !isMainButtonDown) return null;
-  let currentRect = boundingBox;
-
-  if (isMainButtonDown && initialBoundingBoxRef.current) {
-    const { x, y, width, height } = initialBoundingBoxRef.current;
-    const tx = currentMouseX - mouseDownX!;
-    const ty = currentMouseY - mouseDownY!;
-    const transform = new Transform();
-    currentRect = new BoundingBox(x, y, width, height, transform);
-
-    switch (selectedEdgeRef.current) {
-      case "nw":
-        break;
-      case null:
-        transform.tx = tx;
-        transform.ty = ty;
-        break;
-      default:
-        break;
-    }
-
-    transform.multiply(initialBoundingBoxRef.current.transform.toMatrix());
-
-    // currentRect = transformBoundingRect(initialRectRef.current, transform);
-    // console.log("selectedEdgeRef.current: ", selectedEdgeRef.current);
-  }
 
   const handleOnDrag = (e: React.MouseEvent) => {
     const rect = canvasMouseStore.containerDomElement!.getBoundingClientRect();
@@ -178,17 +162,15 @@ const ResizeAndRotate = () => {
   return (
     <Root
       style={{
-        left: currentRect.x,
-        top: currentRect.y,
-        width: currentRect.width,
-        height: currentRect.height,
-        transform: `matrix(
-          ${currentRect.transform.a},
-          ${currentRect.transform.b},
-          ${currentRect.transform.c},
-          ${currentRect.transform.d},
-          ${currentRect.transform.tx},
-          ${currentRect.transform.ty})`,
+        left: 0,
+        top: 0,
+        width: boundingRect?.width,
+        height: boundingRect?.height,
+        transform: `translate(${boundingRect?.x}px, ${
+          boundingRect?.y
+        }px) rotate(${radian2Degree(boundingRect?.rotate ?? 0)}deg)`,
+        transformOrigin: "top left",
+        willChange: "transform",
       }}
     >
       <ControlPoint

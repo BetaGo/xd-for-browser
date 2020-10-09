@@ -1,9 +1,24 @@
-import { inv, multiply } from "mathjs";
 import _ from "lodash";
+import { inv, multiply } from "mathjs";
 
 import { Element } from "./element";
-import { IPoint, pointInRegionWN, Vec3 } from "./utils";
 import { Transform } from "./transform";
+import {
+  createRotateMatrix,
+  createTranslateMatrix,
+  IPoint,
+  multiMatrixMultiply,
+  pointInRegionWN,
+  Vec3,
+} from "./utils";
+
+export interface IBoundingRect {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  rotate: number;
+}
 
 export class BoundingBox {
   constructor(
@@ -14,7 +29,7 @@ export class BoundingBox {
     public transform: Transform = new Transform()
   ) {}
 
-  getTransformed() {
+  getTransformed(): IBoundingRect {
     const a: Vec3 = [this.x, this.y, 1];
     const b: Vec3 = [this.x + this.width, this.y, 1];
     const c: Vec3 = [this.x + this.width, this.y + this.height, 1];
@@ -31,7 +46,7 @@ export class BoundingBox {
 
     const width = ((ta[0] - tb[0]) ** 2 + (ta[1] - tb[1]) ** 2) ** 0.5;
     const height = ((ta[0] - td[0]) ** 2 + (ta[1] - td[1]) ** 2) ** 0.5;
-    const rotate = (Math.asin(this.transform.b) * 180) / Math.PI;
+    const rotate = Math.asin(this.transform.b);
 
     // const eX = multiply(transformMatrix, [1, 0, 1]);
     // const eY = multiply(transformMatrix, [0, 1, 1]);
@@ -106,8 +121,11 @@ export class Rectangle extends Element {
   update() {}
 
   updatePosition(point: IPoint) {
-    this.x = point.x;
-    this.y = point.y;
+    if (this.x !== point.x || this.y !== point.y) {
+      this.x = point.x;
+      this.y = point.y;
+      this.emitBoundingChangeEvent();
+    }
   }
 
   isInnerPoint(point: IPoint): boolean {
@@ -152,6 +170,42 @@ export class Rectangle extends Element {
       _.clone(this.transform)
     );
     return boundingBox;
+  }
+
+  /**
+   *  rotate element
+   * @param angle  (measured in radians)
+   * @param center rotate center point; use element Bounding center by default.
+   */
+  rotate(angle: number, center?: IPoint) {
+    if (!center) {
+      const centerPointVec: Vec3 = [
+        this.x + this.width / 2,
+        this.y + this.height / 2,
+        1,
+      ];
+      const [x, y] = multiply(
+        this.transform.toMatrix(),
+        centerPointVec
+      ).toArray() as number[];
+      center = {
+        x,
+        y,
+      };
+    }
+    const tx = center.x;
+    const ty = center.y;
+    const m = multiMatrixMultiply(
+      createTranslateMatrix(tx, ty),
+      createRotateMatrix(angle),
+      createTranslateMatrix(-tx, -ty)
+    );
+    this.transform.multiply(m, "left");
+    this.emitBoundingChangeEvent();
+  }
+
+  private emitBoundingChangeEvent() {
+    this.emit("boundingChange", { type: "boundingChange", target: this });
   }
 }
 

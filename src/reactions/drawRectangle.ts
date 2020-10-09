@@ -41,8 +41,10 @@ reaction(
       canvasStore.gRender?.add(creatingRect);
       canvasStore.selectedElement = creatingRect;
     } else {
-      creatingRect.transform.tx = x;
-      creatingRect.transform.ty = y;
+      creatingRect.updateTransform({
+        tx: x,
+        ty: y,
+      });
       creatingRect.width = width;
       creatingRect.height = height;
     }

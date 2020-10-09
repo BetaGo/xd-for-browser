@@ -52,6 +52,11 @@ reaction(
     selectedElement.transform.tx = targetX;
     selectedElement.transform.ty = targetY;
 
+    selectedElement.updateTransform({
+      tx: targetX,
+      ty: targetY,
+    });
+
     canvasStore.render();
   }
 );

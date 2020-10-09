@@ -48,13 +48,18 @@ export abstract class Element {
     this.visible = false;
   }
 
+  updateTransform(property: Partial<Transform>) {
+    Object.assign(this.transform, property);
+    this.emit("boundingChange", { type: "boundingChange", target: this });
+  }
+
   abstract name: string;
   abstract type: string;
 
-  abstract update<T>(params: T): void;
   abstract render(): void;
   abstract isInnerPoint(point: IPoint): boolean;
   abstract toJSON(): any;
   abstract getBoundingBox(): BoundingBox;
   abstract updatePosition(point: IPoint): void;
+  abstract rotate(angle: number, center?: IPoint): void;
 }
