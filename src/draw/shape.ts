@@ -173,6 +173,16 @@ export class Rectangle extends Element {
   }
 
   /**
+   * set element current rotate
+   * @param angle
+   */
+  setRotate(angle: number) {
+    const currentAngle = this.getBoundingBox().getTransformed().rotate;
+    const shouldRotateAngle = angle - currentAngle;
+    this.rotate(shouldRotateAngle);
+  }
+
+  /**
    *  rotate element
    * @param angle  (measured in radians)
    * @param center rotate center point; use element Bounding center by default.

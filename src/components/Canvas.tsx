@@ -1,3 +1,4 @@
+import { runInAction } from "mobx";
 import React, { useEffect, useRef } from "react";
 
 import { useStores } from "../hooks/useStores";
@@ -29,7 +30,9 @@ const Canvas = () => {
 
   useEffect(() => {
     canvasStore.initRender(canvasContainerRef.current!);
-    canvasMouseStore.containerDomElement = canvasContainerRef.current!;
+    runInAction(() => {
+      canvasMouseStore.containerDomElement = canvasContainerRef.current!;
+    });
   }, [canvasMouseStore, canvasStore]);
 
   useEffect(() => {

@@ -62,4 +62,5 @@ export abstract class Element {
   abstract getBoundingBox(): BoundingBox;
   abstract updatePosition(point: IPoint): void;
   abstract rotate(angle: number, center?: IPoint): void;
+  abstract setRotate(angle: number): void;
 }

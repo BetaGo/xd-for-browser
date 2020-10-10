@@ -84,7 +84,7 @@ const getControlPointPositionStyle = (edge: ResizeEdge): string => {
 
 const ControlPoint = styled.div<{ resizeEdge: ResizeEdge }>`
   position: absolute;
-  pointer-events: all;
+  pointer-events: none;
   width: 8px;
   height: 8px;
   ${({ resizeEdge }) => getControlPointPositionStyle(resizeEdge)}
@@ -144,19 +144,19 @@ const ResizeAndRotate = () => {
   if (!selectedElement) return null;
 
   const handleOnDrag = (e: React.MouseEvent) => {
-    const rect = canvasMouseStore.containerDomElement!.getBoundingClientRect();
-    canvasMouseStore.update({
-      isMouseMoving: true,
-      currentMouseX: e.clientX - rect.x,
-      currentMouseY: e.clientY - rect.y,
-    });
+    // const rect = canvasMouseStore.containerDomElement!.getBoundingClientRect();
+    // canvasMouseStore.update({
+    //   isMouseMoving: true,
+    //   currentMouseX: e.clientX - rect.x,
+    //   currentMouseY: e.clientY - rect.y,
+    // });
   };
 
   const handleDragEnd = (e: React.MouseEvent) => {
-    selectedEdgeRef.current = null;
-    canvasMouseStore.update({
-      isMouseDown: false,
-    });
+    // selectedEdgeRef.current = null;
+    // canvasMouseStore.update({
+    //   isMouseDown: false,
+    // });
   };
 
   return (

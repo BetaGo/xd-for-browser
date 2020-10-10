@@ -43,20 +43,22 @@ reaction(
       elementBoundingBox = selectedElement.getBoundingBox();
     }
 
-    const dx = mouseDownX! - elementBoundingBox.transform.tx;
-    const dy = mouseDownY! - elementBoundingBox.transform.ty;
+    if (
+      Math.abs(currentMouseX - mouseDownX!) > Number.EPSILON ||
+      Math.abs(currentMouseY - mouseDownY!) > Number.EPSILON
+    ) {
+      const dx = mouseDownX! - elementBoundingBox.transform.tx;
+      const dy = mouseDownY! - elementBoundingBox.transform.ty;
 
-    const targetX = currentMouseX - dx;
-    const targetY = currentMouseY - dy;
+      const targetX = currentMouseX - dx;
+      const targetY = currentMouseY - dy;
 
-    selectedElement.transform.tx = targetX;
-    selectedElement.transform.ty = targetY;
+      selectedElement.updateTransform({
+        tx: targetX,
+        ty: targetY,
+      });
 
-    selectedElement.updateTransform({
-      tx: targetX,
-      ty: targetY,
-    });
-
-    canvasStore.render();
+      canvasStore.render();
+    }
   }
 );
