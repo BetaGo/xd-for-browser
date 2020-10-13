@@ -1,4 +1,5 @@
 import EventEmitter from "eventemitter3";
+import { IElementMeta } from "./elementMeta";
 
 import { IElementEventMap } from "./events";
 import { GRender } from "./gRender";
@@ -11,6 +12,7 @@ export abstract class Element {
   visible: boolean = true;
   style: Style = new Style();
   transform: Transform = new Transform();
+  rotation: number = 0;
   gRender?: GRender;
   eventEmitter = new EventEmitter();
 

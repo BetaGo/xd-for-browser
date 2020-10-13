@@ -17,7 +17,6 @@ export interface IBoundingRect {
   y: number;
   width: number;
   height: number;
-  rotate: number;
 }
 
 export class BoundingBox {
@@ -46,7 +45,6 @@ export class BoundingBox {
 
     const width = ((ta[0] - tb[0]) ** 2 + (ta[1] - tb[1]) ** 2) ** 0.5;
     const height = ((ta[0] - td[0]) ** 2 + (ta[1] - td[1]) ** 2) ** 0.5;
-    const rotate = Math.asin(this.transform.b);
 
     // const eX = multiply(transformMatrix, [1, 0, 1]);
     // const eY = multiply(transformMatrix, [0, 1, 1]);
@@ -56,7 +54,6 @@ export class BoundingBox {
       y,
       width,
       height,
-      rotate,
     };
 
     return newRect;
@@ -174,12 +171,14 @@ export class Rectangle extends Element {
 
   /**
    * set element current rotate
-   * @param angle
+   * @param angle (measured in radians)
    */
   setRotate(angle: number) {
-    const currentAngle = this.getBoundingBox().getTransformed().rotate;
-    const shouldRotateAngle = angle - currentAngle;
-    this.rotate(shouldRotateAngle);
+    const shouldRotateAngle = angle - this.rotation;
+    if (Math.abs(shouldRotateAngle) > Number.EPSILON) {
+      this.rotate(shouldRotateAngle);
+      this.rotation = angle % (2 * Math.PI);
+    }
   }
 
   /**

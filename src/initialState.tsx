@@ -1,5 +1,6 @@
 import { Rectangle } from "./draw/shape";
 import { FillStyle, LinearGradient, StrokeStyle } from "./draw/style";
+import { degree2Radian } from "./draw/utils";
 import { CanvasStore } from "./stores/canvas";
 
 export const setUpDevelopmentInitialCanvasStore = (
@@ -42,6 +43,7 @@ export const setUpDevelopmentInitialCanvasStore = (
   // Rectangle 3
   const rect3 = new Rectangle(0, 0, 89, 80);
   rect3.name = "Rectangle 3";
+  rect3.rotation = degree2Radian(-31);
   rect3.transform.tx = 45.75453186035156;
   rect3.transform.ty = 257.63250732421875;
   rect3.transform.a = 0.8571673035621643;
@@ -61,6 +63,7 @@ export const setUpDevelopmentInitialCanvasStore = (
   // Rectangle 5
   const rect5 = new Rectangle(0, 0, 105, 80);
   rect5.name = "Rectangle 5";
+  rect5.rotation = degree2Radian(-62);
   rect5.transform.tx = 180.5348358154297;
   rect5.transform.ty = 113.57588958740234;
   rect5.transform.a = 0.4694715738296509;

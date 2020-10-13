@@ -114,7 +114,6 @@ const calculateBoundingRect = (element: Element): IBoundingRect => {
   const boundingRect: IBoundingRect = {
     x: currentBoundingBox.transform.tx + currentBoundingBox.x,
     y: currentBoundingBox.transform.ty + currentBoundingBox.y,
-    rotate: Math.asin(currentBoundingBox.transform.b),
     width: t.width,
     height: t.height,
   };
@@ -168,7 +167,7 @@ const ResizeAndRotate = () => {
         height: boundingRect?.height,
         transform: `translate(${boundingRect?.x}px, ${
           boundingRect?.y
-        }px) rotate(${radian2Degree(boundingRect?.rotate ?? 0)}deg)`,
+        }px) rotate(${radian2Degree(selectedElement.rotation ?? 0)}deg)`,
         transformOrigin: "top left",
         willChange: "transform",
       }}

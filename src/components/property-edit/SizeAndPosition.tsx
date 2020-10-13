@@ -50,7 +50,6 @@ const SizeAndPosition = () => {
         boundingRectInput.y = boundingBox.y.toString();
         boundingRectInput.width = boundingBox.width.toString();
         boundingRectInput.height = boundingBox.height.toString();
-        boundingRectInput.rotate = radian2Degree(boundingBox.rotate).toString();
       });
       // setBoundingRect(e.target.getBoundingBox().getTransformed());
     };
@@ -62,7 +61,6 @@ const SizeAndPosition = () => {
         boundingRectInput.y = boundingBox.y.toString();
         boundingRectInput.width = boundingBox.width.toString();
         boundingRectInput.height = boundingBox.height.toString();
-        boundingRectInput.rotate = radian2Degree(boundingBox.rotate).toString();
       });
       selectedElement.on("boundingChange", handleBoundingChange);
       return () => {
@@ -105,7 +103,7 @@ const SizeAndPosition = () => {
         label="R"
         isQuiet
         autoSelect
-        value={boundingRectInput.rotate.toString()}
+        value={radian2Degree(selectedElement?.rotation ?? 0).toString()}
         onChange={(e) => {
           boundingRectInput.update("rotate", e);
         }}
