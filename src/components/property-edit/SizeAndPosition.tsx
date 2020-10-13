@@ -1,13 +1,12 @@
-import React, { useEffect, useState } from "react";
-import styled from "../../styles/styled";
+import _ from "lodash";
+import { runInAction } from "mobx";
 import { observer, useLocalObservable } from "mobx-react";
-import { useStores } from "../../hooks/useStores";
-import { IBoundingRect } from "../../draw/shape";
+import React, { useEffect } from "react";
+
 import { IElementEvent } from "../../draw/events";
 import { degree2Radian, radian2Degree } from "../../draw/utils";
-import { observable, runInAction } from "mobx";
-import _ from "lodash";
-
+import { useStores } from "../../hooks/useStores";
+import styled from "../../styles/styled";
 import Input from "../common/Input";
 
 const Root = styled.div``;

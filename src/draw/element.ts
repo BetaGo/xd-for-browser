@@ -1,5 +1,4 @@
 import EventEmitter from "eventemitter3";
-import { IElementMeta } from "./elementMeta";
 
 import { IElementEventMap } from "./events";
 import { GRender } from "./gRender";

@@ -121,7 +121,7 @@ const calculateBoundingRect = (element: Element): IBoundingRect => {
 };
 
 const ResizeAndRotate = () => {
-  const { canvasStore, canvasMouseStore } = useStores();
+  const { canvasStore } = useStores();
   const selectedEdgeRef = useRef<ResizeEdge | null>(null);
 
   const { selectedElement } = canvasStore;

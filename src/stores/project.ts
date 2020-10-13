@@ -12,6 +12,7 @@ export class ProjectStore {
     if (!xdProjectFile) return;
     const xdProjectData = await zip.loadAsync(xdProjectFile);
     console.log(xdProjectData);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     for (const [xdProjectFilePath, xdProjectFileInfo] of Object.entries(
       xdProjectData.file
     )) {

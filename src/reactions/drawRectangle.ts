@@ -1,4 +1,5 @@
-import { reaction, runInAction } from "mobx";
+import { reaction } from "mobx";
+
 import { DesignTool } from "../constants";
 import { globalStores } from "../contexts";
 import { Rectangle } from "../draw/shape";
