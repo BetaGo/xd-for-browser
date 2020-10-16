@@ -2,7 +2,7 @@ import EventEmitter from "eventemitter3";
 
 import { IElementEventMap } from "./events";
 import { GRender } from "./gRender";
-import { BoundingBox } from "./shape";
+import { BoundingBox, IBoundingRect } from "./shape";
 import { Style } from "./style";
 import { Transform } from "./transform";
 import { IPoint } from "./utils";
@@ -61,7 +61,22 @@ export abstract class Element {
   abstract isInnerPoint(point: IPoint): boolean;
   abstract toJSON(): any;
   abstract getBoundingBox(): BoundingBox;
+  abstract setBounding<K extends keyof IBoundingRect>(
+    key: K,
+    value: IBoundingRect[K]
+  ): void;
   abstract updatePosition(point: IPoint): void;
+
+  /**
+   *  rotate element
+   * @param angle  (measured in radians)
+   * @param center rotate center point; use element Bounding center by default.
+   */
   abstract rotate(angle: number, center?: IPoint): void;
+
+  /**
+   * set element current rotate
+   * @param angle (measured in radians)
+   */
   abstract setRotate(angle: number): void;
 }

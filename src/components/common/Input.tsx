@@ -53,7 +53,7 @@ const Input: React.FC<SpectrumTextFieldProps & IInputNumberProps> = (props) => {
   };
 
   const handleOnChange = (e: string) => {
-    setIsFocus(true);
+    // setIsFocus(true);
     // const v = addonAfter ? e + addonAfter : e;
     setDisplayValue(e);
     onChange?.(e);

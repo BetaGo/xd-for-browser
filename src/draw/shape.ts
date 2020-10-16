@@ -169,10 +169,41 @@ export class Rectangle extends Element {
     return boundingBox;
   }
 
-  /**
-   * set element current rotate
-   * @param angle (measured in radians)
-   */
+  setBounding<K extends keyof IBoundingRect>(key: K, value: IBoundingRect[K]) {
+    switch (key) {
+      case "x": {
+        const currentX = this.getBoundingBox().getTransformed().x;
+        const m = createTranslateMatrix(value - currentX, 0);
+        this.transform.multiply(m, "left");
+        this.emitBoundingChangeEvent();
+        break;
+      }
+
+      case "y": {
+        const currentY = this.getBoundingBox().getTransformed().y;
+        const m = createTranslateMatrix(0, value - currentY);
+        this.transform.multiply(m, "left");
+        this.emitBoundingChangeEvent();
+        break;
+      }
+
+      case "width": {
+        this.width = value;
+        this.emitBoundingChangeEvent();
+        break;
+      }
+
+      case "height": {
+        this.height = value;
+        this.emitBoundingChangeEvent();
+        break;
+      }
+
+      default:
+        break;
+    }
+  }
+
   setRotate(angle: number) {
     const shouldRotateAngle = angle - this.rotation;
     if (Math.abs(shouldRotateAngle) > Number.EPSILON) {
@@ -181,11 +212,6 @@ export class Rectangle extends Element {
     }
   }
 
-  /**
-   *  rotate element
-   * @param angle  (measured in radians)
-   * @param center rotate center point; use element Bounding center by default.
-   */
   rotate(angle: number, center?: IPoint) {
     if (!center) {
       const centerPointVec: Vec3 = [
