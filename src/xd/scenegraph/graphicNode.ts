@@ -30,6 +30,6 @@ export abstract class GraphicNode extends SceneNode {
   strokeDashOffset: number = 0;
   shadow: Shadow | null = null;
   blur: Blur | null = null;
-  abstract readonly pathData: string;
-  abstract readonly hasLinkedGraphicFill: boolean;
+  abstract get pathData(): string;
+  abstract get hasLinkedGraphicFill(): boolean;
 }

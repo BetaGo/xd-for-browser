@@ -1,24 +1,11 @@
 import { Bounds, Point } from "../typedefs";
-import { createIdentityMatrix } from "./matrix";
 import { SceneNode } from "./sceneNode";
 
 export class RootNode extends SceneNode {
-  name: string = "";
-  parent = null;
   isInArtworkTree = true;
   isContainer = true;
-  selected = false;
-  visible = true;
-  opacity = 1;
-  transform = createIdentityMatrix();
-  translation = {
-    x: 0,
-    y: 0,
-  };
-  children: SceneNode[] = [];
-  get rotation() {
-    return 0;
-  }
+
+  rotation = 0;
 
   get globalBounds(): Bounds {
     const boundsList = this.children.map((v) => v.globalBounds);
@@ -43,26 +30,22 @@ export class RootNode extends SceneNode {
     };
   }
 
-  get localCenterPoint(): Point {
-    return {
-      x: this.localBounds.x + this.localBounds.width / 2,
-      y: this.localBounds.y + this.localBounds.height / 2,
-    };
-  }
-
   get globalDrawBounds(): Bounds {
     const boundsList = this.children.map((v) => v.globalDrawBounds);
     return mergeBounds(boundsList);
   }
 
   get hasDefaultName(): boolean {
+    //TODO:
     return true;
   }
 
   get hasCustomConstraints(): boolean {
+    //TODO:
     return false;
   }
   get hasLinkedContent(): boolean {
+    //TODO:
     return false;
   }
 
@@ -70,26 +53,32 @@ export class RootNode extends SceneNode {
   markedForExport = false;
   restToAutoConstraints() {
     // TODO:
+    throw new Error("Method not implemented.");
   }
 
   removeFromParent() {
     // TODO:
+    throw new Error("Method not implemented.");
   }
 
   moveInParentCoordinates(deltaX: number, deltaY: number) {
     // TODO:
+    throw new Error("Method not implemented.");
   }
 
   placeInParentCoordinates(registrationPoint: Point, parentPoint: Point) {
     // TODO:
+    throw new Error("Method not implemented.");
   }
 
   rotateAround(deltaAngle: number, rotationCenter: Point) {
     // TODO:
+    throw new Error("Method not implemented.");
   }
 
   resize(width: number, height: number) {
     // TODO:
+    throw new Error("Method not implemented.");
   }
 
   addChild(node: SceneNode, index?: number): void {
@@ -116,7 +105,7 @@ export class RootNode extends SceneNode {
     }
   }
   removeAllChildren(): void {
-    this.children = [];
+    this.children.length = 0;
   }
 }
 

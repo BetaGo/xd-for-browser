@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import { Bounds, Interaction, Point } from "../typedefs";
-import { Matrix } from "./matrix";
+import { createIdentityMatrix, Matrix } from "./matrix";
 
 export abstract class SceneNode {
   static BLEND_MODE_PASSTHROUGH = "BLEND_MODE_PASSTHROUGH";
@@ -27,47 +27,53 @@ export abstract class SceneNode {
   static SIZE_FIXED = "SIZE_FIXED";
   static SIZE_RESIZES = "SIZE_RESIZES";
 
-  constructor() {
-    this.guid = uuidv4();
-  }
-
+  name: string = "";
   blendMode: string = SceneNode.BLEND_MODE_PASSTHROUGH;
-
   fixedWhenScrolling?: boolean;
   horizontalConstraints?: { position: string; size: string };
   verticalConstraints?: { position: string; size: string };
   pluginData: any;
   sharedPluginData: any;
+  visible: boolean = true;
+  opacity: number = 1;
+  locked: boolean = false;
+  markedForExport: boolean = false;
 
-  readonly guid: string;
+  get localCenterPoint(): Point {
+    return {
+      x: this.localBounds.x + this.localBounds.width / 2,
+      y: this.localBounds.y + this.localBounds.height / 2,
+    };
+  }
+
+  get translation() {
+    return {
+      x: this.transform.e,
+      y: this.transform.f,
+    };
+  }
+
+  readonly guid: string = uuidv4();
   readonly triggeredInteractions: Interaction[] = [];
+  readonly parent: SceneNode | null = null;
+  readonly children: SceneNode[] = [];
+  readonly selected: boolean = false;
+  readonly transform: Matrix = createIdentityMatrix();
 
-  abstract readonly parent: SceneNode | null = null;
-  abstract readonly children: SceneNode[] = [];
+  abstract get rotation(): number;
+  abstract get globalBounds(): Bounds;
+  abstract get localBounds(): Bounds;
+  abstract get boundsInParent(): Bounds;
+  abstract get topLeftInParent(): Point;
+  abstract get globalDrawBounds(): Bounds;
+  abstract get hasDefaultName(): boolean;
+  abstract get hasCustomConstraints(): boolean;
+  abstract get hasLinkedContent(): boolean;
+
   abstract readonly isInArtworkTree: boolean;
   abstract readonly isContainer: boolean;
-  abstract readonly selected: boolean;
-  abstract visible: boolean;
-  abstract opacity: number;
-  abstract readonly transform: Matrix;
-  abstract translation: {
-    x: number;
-    y: number;
-  };
-  abstract readonly rotation: number;
-  abstract readonly globalBounds: Bounds;
-  abstract readonly localBounds: Bounds;
-  abstract readonly boundsInParent: Bounds;
-  abstract readonly topLeftInParent: Point;
-  abstract readonly localCenterPoint: Point;
-  abstract readonly globalDrawBounds: Bounds;
-  abstract name: string;
-  abstract readonly hasDefaultName: boolean;
-  abstract locked: boolean;
-  abstract markedForExport: boolean;
-  abstract readonly hasCustomConstraints: boolean;
+
   abstract restToAutoConstraints(): void;
-  abstract readonly hasLinkedContent: boolean;
   abstract removeFromParent(): void;
   abstract moveInParentCoordinates(deltaX: number, deltaY: number): void;
   abstract placeInParentCoordinates(

@@ -1,12 +1,14 @@
 import JSZip from "jszip";
 
 import { openFile } from "../utils/fileUtils";
+import { RootNode } from "../xd/scenegraph/rootNode";
 
 const zip = new JSZip();
 
 const artboardFileNameRegexp = /^artwork\/artboard-([\w | -]+)\/(.+)(graphicContent\.agc)/;
 
 export class ProjectStore {
+  rootNode: RootNode | null = null;
   async loadXDFile() {
     const xdProjectFile = await openFile(".xd");
     if (!xdProjectFile) return;
