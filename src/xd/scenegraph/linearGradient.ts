@@ -1,9 +1,5 @@
 import _ from "lodash";
 import { Color } from "./color";
-
-/**
- * @see https://adobexdplatform.com/plugin-docs/reference/LinearGradientFill.html
- */
 export class LinearGradient {
   colorStops: Array<{
     stop: number;

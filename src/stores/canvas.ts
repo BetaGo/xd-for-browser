@@ -2,6 +2,7 @@ import { makeObservable, observable, runInAction } from "mobx";
 
 import { MouseEventButton } from "../constants";
 import { Element } from "../draw/element";
+import { RootNode } from "../draw/elements/rootNode";
 import { GRender } from "../draw/gRender";
 import { setUpDevelopmentInitialCanvasStore } from "../initialState";
 
@@ -15,9 +16,9 @@ export class CanvasStore {
     });
   }
 
-  initRender(element: HTMLElement) {
+  initRender(element: HTMLElement, rootNode: RootNode) {
     this.gRender = GRender.init(element);
-    this.gRender.setBackgroundColor("rgb(228,228,228)");
+    this.gRender.rootNode = rootNode;
 
     setUpDevelopmentInitialCanvasStore(this);
 

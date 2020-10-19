@@ -8,9 +8,6 @@ export type ColorParam =
   | number
   | { [key: string]: any };
 
-/**
- * @see https://adobexdplatform.com/plugin-docs/reference/Color.html
- */
 export class Color {
   get a(): number {
     return Math.floor(this._color.a() * 255);
@@ -73,6 +70,10 @@ export class Color {
         .join("");
       return `#${s}`;
     }
+  }
+
+  string() {
+    return this._color.string();
   }
 
   clone() {

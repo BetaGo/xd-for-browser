@@ -2,7 +2,7 @@ import { Blur } from "./blur";
 import { Color } from "./color";
 import { ImageFill } from "./imageFill";
 import { LinearGradient } from "./linearGradient";
-import { RadialGradient } from "./RadialGradient";
+import { RadialGradient } from "./radialGradient";
 import { SceneNode } from "./sceneNode";
 import { Shadow } from "./shadow";
 

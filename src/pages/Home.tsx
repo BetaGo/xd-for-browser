@@ -3,9 +3,10 @@ import React from "react";
 import { useStores } from "../hooks/useStores";
 
 import styled from "../styles/styled";
-import { RootNode } from "../xd/scenegraph/rootNode";
-import { Artboard } from "../xd/scenegraph/artboard";
+import { RootNode } from "../draw/elements/rootNode";
+import { Artboard } from "../draw/elements/artboard";
 import { useHistory } from "react-router-dom";
+import { Color } from "../xd/scenegraph/color";
 
 const Root = styled.div`
   width: 100%;
@@ -46,6 +47,9 @@ const Home = () => {
   const handleCreateProject = (width: number, height: number) => {
     const rootNode = new RootNode();
     const initialArtboard = new Artboard();
+    initialArtboard.width = width;
+    initialArtboard.height = height;
+    initialArtboard.fill = new Color("#fff");
     rootNode.addChild(initialArtboard);
     projectStore.rootNode = rootNode;
     history.replace("/design");

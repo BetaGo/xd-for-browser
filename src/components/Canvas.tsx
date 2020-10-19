@@ -1,5 +1,7 @@
 import { runInAction } from "mobx";
 import React, { useEffect, useRef } from "react";
+import { useHistory } from "react-router-dom";
+import { IPoint } from "../draw/utils";
 
 import { useStores } from "../hooks/useStores";
 import styled from "../styles/styled";
@@ -24,16 +26,21 @@ const OperationLayer = styled.div`
 `;
 
 const Canvas = () => {
-  const { canvasStore, canvasMouseStore } = useStores();
+  const { canvasStore, canvasMouseStore, projectStore } = useStores();
   const canvasContainerRef = useRef<HTMLDivElement>(null);
   const operationLayerRef = useRef<HTMLDivElement>(null);
+  const history = useHistory();
 
   useEffect(() => {
-    canvasStore.initRender(canvasContainerRef.current!);
+    if (!projectStore.rootNode) {
+      history.replace("/");
+      return;
+    }
+    canvasStore.initRender(canvasContainerRef.current!, projectStore.rootNode);
     runInAction(() => {
       canvasMouseStore.containerDomElement = canvasContainerRef.current!;
     });
-  }, [canvasMouseStore, canvasStore]);
+  }, [canvasMouseStore, canvasStore, history, projectStore]);
 
   useEffect(() => {
     let mouseMoveDetectTimer: ReturnType<typeof setTimeout>;
@@ -73,6 +80,17 @@ const Canvas = () => {
     };
   }, [canvasMouseStore]);
 
+  const handleWheelEvent = (e: React.WheelEvent) => {
+    const nextScale = canvasStore.gRender!.scale - (e.deltaY / 100) * 0.2;
+    const rect = operationLayerRef.current!.getBoundingClientRect();
+    const mousePoint: IPoint = {
+      x: e.clientX - rect.x,
+      y: e.clientY - rect.y,
+    };
+    console.log(mousePoint);
+    canvasStore.gRender?.zoom(nextScale, mousePoint);
+  };
+
   return (
     <Root
       onMouseDown={(e) => {
@@ -85,6 +103,7 @@ const Canvas = () => {
           mouseDownY: e.clientY - rect.y,
         });
       }}
+      onWheel={handleWheelEvent}
       ref={canvasContainerRef}
     >
       <OperationLayer ref={operationLayerRef}>

@@ -1,10 +1,11 @@
-import Color from "color";
 import EventEmitter from "eventemitter3";
 import ResizeObserver from "resize-observer-polyfill";
+import { MouseEventButton } from "../constants";
+import { createIdentityMatrix, Matrix } from "../xd/scenegraph/matrix";
 
 import { Element } from "./element";
+import { RootNode } from "./elements/rootNode";
 import { IGRenderEventMap } from "./events";
-import { ColorParam } from "./style";
 import { IPoint, setupCanvas } from "./utils";
 
 export class GRender {
@@ -15,9 +16,8 @@ export class GRender {
   containerElement: HTMLElement;
   canvasElement: HTMLCanvasElement;
   canvasCtx2D: CanvasRenderingContext2D;
-  elements: Element[] = [];
+  rootNode: RootNode | null = null;
   eventEmitter = new EventEmitter();
-  backgroundColor: Color = new Color("#fff");
 
   private canvasResizeObserver = new ResizeObserver((entries) => {
     for (const entry of entries) {
@@ -31,6 +31,19 @@ export class GRender {
     }
   });
 
+  readonly dpr: number;
+
+  scale: number = 1;
+
+  get renderScale(): number {
+    return this.scale * this.dpr;
+  }
+
+  transform: Matrix;
+
+  private MouseDownButton: MouseEventButton | null = null;
+  private MouseDownPoint: IPoint | null = null;
+
   constructor(container: HTMLElement) {
     this.containerElement = container;
 
@@ -40,8 +53,15 @@ export class GRender {
       `display: block; width: 100%; height: 100%`
     );
     this.containerElement.appendChild(this.canvasElement);
+    this.dpr = window.devicePixelRatio || 1;
+    const rect = this.canvasElement.getBoundingClientRect();
+    this.canvasElement.width = rect.width * this.dpr;
+    this.canvasElement.height = rect.height * this.dpr;
+    this.canvasCtx2D = this.canvasElement.getContext("2d")!;
 
-    this.canvasCtx2D = setupCanvas(this.canvasElement)!;
+    this.transform = createIdentityMatrix();
+    this.transform.a = this.dpr;
+    this.transform.d = this.dpr;
 
     this.resizeCanvas();
 
@@ -52,8 +72,14 @@ export class GRender {
     this.canvasResizeObserver.observe(this.canvasElement);
   }
 
-  setBackgroundColor(color: ColorParam) {
-    this.backgroundColor = new Color(color);
+  zoom(value: number, center?: IPoint) {
+    const minValue = 0.025;
+    const maxValue = 64;
+    const v = Math.min(Math.max(value, minValue), maxValue);
+    this.transform.a = (this.transform.a / this.scale) * v;
+    this.transform.d = (this.transform.d / this.scale) * v;
+    this.scale = v;
+    this.render();
   }
 
   resizeCanvas() {
@@ -62,26 +88,34 @@ export class GRender {
 
   render() {
     const rect = this.canvasElement.getBoundingClientRect();
+
+    this.canvasCtx2D.setTransform(
+      this.transform.a,
+      this.transform.b,
+      this.transform.c,
+      this.transform.d,
+      this.transform.e,
+      this.transform.f
+    );
+
     this.canvasCtx2D.save();
-    this.canvasCtx2D.fillStyle = this.backgroundColor.string();
-    this.canvasCtx2D.fillRect(0, 0, rect.width, rect.height);
+    this.canvasCtx2D.resetTransform();
+    this.canvasCtx2D.clearRect(
+      0,
+      0,
+      rect.width * this.dpr,
+      rect.height * this.dpr
+    );
     this.canvasCtx2D.restore();
-    for (let i = this.elements.length - 1; i >= 0; i--) {
-      const currentElement = this.elements[i];
-      currentElement.render();
-    }
+    this.rootNode?.render(this);
   }
 
-  add(element: Element) {
-    element.gRender = this;
-    this.elements.unshift(element);
+  add(element: any) {
+    //TODO:
   }
 
-  remove(element: Element) {
-    const index = this.elements.indexOf(element);
-    if (index !== -1) {
-      this.elements.splice(index, 1);
-    }
+  remove(element: any) {
+    // TODO:
   }
 
   on<K extends keyof IGRenderEventMap>(
@@ -99,11 +133,8 @@ export class GRender {
   }
 
   getElementFromPoint(point: IPoint): Element | undefined {
-    for (const currentElement of this.elements) {
-      if (currentElement.isInnerPoint(point)) {
-        return currentElement;
-      }
-    }
+    // TODO:
+    return;
   }
 
   listenCanvasDomEvents() {

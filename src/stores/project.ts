@@ -1,7 +1,7 @@
 import JSZip from "jszip";
 
 import { openFile } from "../utils/fileUtils";
-import { RootNode } from "../xd/scenegraph/rootNode";
+import { RootNode } from "../draw/elements/rootNode";
 
 const zip = new JSZip();
 
