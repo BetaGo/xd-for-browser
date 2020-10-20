@@ -1,7 +1,9 @@
 import HomeIcon from "@spectrum-icons/workflow/Home";
+import { observer } from "mobx-react";
 import React from "react";
 import { NavLink } from "react-router-dom";
 
+import { useStores } from "../hooks/useStores";
 import styled from "../styles/styled";
 import Menu from "./Menu";
 
@@ -71,6 +73,7 @@ const NavItem = styled(NavLink)`
 `;
 
 const Header = () => {
+  const { canvasStore } = useStores();
   return (
     <Root>
       <LeftActions>
@@ -97,9 +100,9 @@ const Header = () => {
         </LeftActionItem>
       </LeftActions>
       <CenterActions>XD Tutorial</CenterActions>
-      <RightActions>6.3%</RightActions>
+      <RightActions>{(canvasStore.scale * 100).toFixed(2)}%</RightActions>
     </Root>
   );
 };
 
-export default Header;
+export default observer(Header);

@@ -1,8 +1,8 @@
 import EventEmitter from "eventemitter3";
 import ResizeObserver from "resize-observer-polyfill";
+
 import { MouseEventButton } from "../constants";
 import { createIdentityMatrix, Matrix } from "../xd/scenegraph/matrix";
-
 import { Element } from "./element";
 import { RootNode } from "./elements/rootNode";
 import { IGRenderEventMap } from "./events";
@@ -76,8 +76,17 @@ export class GRender {
     const minValue = 0.025;
     const maxValue = 64;
     const v = Math.min(Math.max(value, minValue), maxValue);
-    this.transform.a = (this.transform.a / this.scale) * v;
-    this.transform.d = (this.transform.d / this.scale) * v;
+    const extraScale = v / this.scale;
+    if (center) {
+      this.transform.scale(
+        extraScale,
+        extraScale,
+        center.x * this.dpr - this.transform.e,
+        center.y * this.dpr - this.transform.f
+      );
+    } else {
+      this.transform.scale(extraScale);
+    }
     this.scale = v;
     this.render();
   }

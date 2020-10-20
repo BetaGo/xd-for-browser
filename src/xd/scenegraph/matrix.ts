@@ -122,12 +122,23 @@ export class Matrix {
   }
 
   scale(s: number): Matrix;
-  scale(sx: number, sy?: number, cx?: number, cy?: number): Matrix;
+  scale(sx: number, sy: number): Matrix;
+  scale(sx: number, sy: number, cx: number, cy: number): Matrix;
   scale(...args: number[]) {
     if (args.length === 1) {
-      // TODO: scale
-    } else {
-      // TODO:
+      const [s] = args;
+      this.a *= s;
+      this.d *= s;
+    } else if (args.length === 2) {
+      const [sx, sy] = args;
+      this.a *= sx;
+      this.d *= sy;
+    } else if (args.length === 4) {
+      const [sx, sy, cx, cy] = args;
+      this.a *= sx;
+      this.d *= sy;
+      this.e += cx * (1 - sx);
+      this.f += cy * (1 - sy);
     }
     return this;
   }

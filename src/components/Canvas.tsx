@@ -1,8 +1,8 @@
 import { runInAction } from "mobx";
 import React, { useEffect, useRef } from "react";
 import { useHistory } from "react-router-dom";
-import { IPoint } from "../draw/utils";
 
+import { IPoint } from "../draw/utils";
 import { useStores } from "../hooks/useStores";
 import styled from "../styles/styled";
 import PositionTip from "./canvas-controls/PositionTip";
@@ -81,14 +81,19 @@ const Canvas = () => {
   }, [canvasMouseStore]);
 
   const handleWheelEvent = (e: React.WheelEvent) => {
-    const nextScale = canvasStore.gRender!.scale - (e.deltaY / 100) * 0.2;
-    const rect = operationLayerRef.current!.getBoundingClientRect();
-    const mousePoint: IPoint = {
-      x: e.clientX - rect.x,
-      y: e.clientY - rect.y,
-    };
-    console.log(mousePoint);
-    canvasStore.gRender?.zoom(nextScale, mousePoint);
+    if (e.altKey) {
+      const nextScale = canvasStore.gRender!.scale - (e.deltaY / 100) * 0.2;
+      const rect = operationLayerRef.current!.getBoundingClientRect();
+      const mousePoint: IPoint = {
+        x: e.clientX - rect.x,
+        y: e.clientY - rect.y,
+      };
+      canvasStore.zoom(nextScale, mousePoint);
+    } else {
+      const scrollY = -e.deltaY;
+      canvasStore.gRender?.transform.translate(0, scrollY);
+      canvasStore.render();
+    }
   };
 
   return (

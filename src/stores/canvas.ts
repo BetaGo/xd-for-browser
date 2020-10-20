@@ -1,26 +1,44 @@
-import { makeObservable, observable, runInAction } from "mobx";
+import {
+  makeAutoObservable,
+  makeObservable,
+  observable,
+  runInAction,
+} from "mobx";
 
 import { MouseEventButton } from "../constants";
 import { Element } from "../draw/element";
 import { RootNode } from "../draw/elements/rootNode";
 import { GRender } from "../draw/gRender";
-import { setUpDevelopmentInitialCanvasStore } from "../initialState";
+import { IPoint } from "../draw/utils";
+
+class GRenderObservable extends GRender {
+  constructor(container: HTMLElement) {
+    super(container);
+    makeObservable(this, {
+      scale: observable,
+    });
+  }
+}
 
 export class CanvasStore {
   gRender?: GRender;
   selectedElement?: Element;
 
+  get scale() {
+    return this.gRender?.scale ?? 1;
+  }
+
   constructor() {
-    makeObservable(this, {
-      selectedElement: observable,
-    });
+    makeAutoObservable(this);
+  }
+
+  zoom(value: number, center?: IPoint) {
+    this.gRender?.zoom(value, center);
   }
 
   initRender(element: HTMLElement, rootNode: RootNode) {
-    this.gRender = GRender.init(element);
+    this.gRender = new GRenderObservable(element);
     this.gRender.rootNode = rootNode;
-
-    setUpDevelopmentInitialCanvasStore(this);
 
     this.gRender.on("mousedown", (e) => {
       if (e.browserMouseEvent.button === MouseEventButton.Main) {
