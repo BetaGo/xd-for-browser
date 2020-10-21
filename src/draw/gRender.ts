@@ -18,6 +18,7 @@ export class GRender {
   canvasCtx2D: CanvasRenderingContext2D;
   rootNode: RootNode | null = null;
   eventEmitter = new EventEmitter();
+  transform: Matrix;
 
   private canvasResizeObserver = new ResizeObserver((entries) => {
     for (const entry of entries) {
@@ -32,14 +33,6 @@ export class GRender {
   });
 
   readonly dpr: number;
-
-  scale: number = 1;
-
-  get renderScale(): number {
-    return this.scale * this.dpr;
-  }
-
-  transform: Matrix;
 
   private MouseDownButton: MouseEventButton | null = null;
   private MouseDownPoint: IPoint | null = null;
@@ -72,23 +65,17 @@ export class GRender {
     this.canvasResizeObserver.observe(this.canvasElement);
   }
 
-  zoom(value: number, center?: IPoint) {
-    const minValue = 0.025;
-    const maxValue = 64;
-    const v = Math.min(Math.max(value, minValue), maxValue);
-    const extraScale = v / this.scale;
+  scale(value: number, center?: IPoint) {
     if (center) {
       this.transform.scale(
-        extraScale,
-        extraScale,
+        value,
+        value,
         center.x * this.dpr - this.transform.e,
         center.y * this.dpr - this.transform.f
       );
     } else {
-      this.transform.scale(extraScale);
+      this.transform.scale(value);
     }
-    this.scale = v;
-    this.render();
   }
 
   resizeCanvas() {

@@ -46,11 +46,22 @@ const Home = () => {
   const history = useHistory();
   const handleCreateProject = (width: number, height: number) => {
     const rootNode = new RootNode();
+
     const initialArtboard = new Artboard();
+    initialArtboard.name = "hello";
     initialArtboard.width = width;
     initialArtboard.height = height;
     initialArtboard.fill = new Color("#fff");
+
+    const artboard2 = new Artboard();
+    artboard2.name = "artboard 2";
+    artboard2.width = width;
+    artboard2.height = height;
+    artboard2.fill = new Color("#fff");
+    artboard2.transform.translate(width + 100, 0);
+
     rootNode.addChild(initialArtboard);
+    rootNode.addChild(artboard2);
     projectStore.rootNode = rootNode;
     history.replace("/design");
   };

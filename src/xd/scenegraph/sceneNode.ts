@@ -38,6 +38,8 @@ export abstract class SceneNode {
   opacity: number = 1;
   locked: boolean = false;
   markedForExport: boolean = false;
+  parent: SceneNode | null = null;
+  selected: boolean = false;
 
   get localCenterPoint(): Point {
     return {
@@ -55,9 +57,7 @@ export abstract class SceneNode {
 
   readonly guid: string = uuidv4();
   readonly triggeredInteractions: Interaction[] = [];
-  readonly parent: SceneNode | null = null;
   readonly children: SceneNode[] = [];
-  readonly selected: boolean = false;
   readonly transform: Matrix = createIdentityMatrix();
 
   abstract get rotation(): number;

@@ -5,55 +5,65 @@ import { DesignTool, OtherTool } from "./constants";
 import { globalStores } from "./contexts";
 
 export function listenKeyboardEvents() {
-  keyboardJS.bind("v", () => {
+  keyboardJS.bind("v", (e: any) => {
+    if (e?.target?.tagName?.toUpperCase() === "INPUT") return;
     runInAction(() => {
       globalStores.uiStore.selectedDesignTool = DesignTool.Select;
     });
   });
 
-  keyboardJS.bind("r", () => {
+  keyboardJS.bind("r", (e: any) => {
+    if (e?.target?.tagName?.toUpperCase() === "INPUT") return;
+    console.log(e);
     runInAction(() => {
       globalStores.uiStore.selectedDesignTool = DesignTool.Rectangle;
     });
   });
 
-  keyboardJS.bind("e", () => {
+  keyboardJS.bind("e", (e: any) => {
+    if (e?.target?.tagName?.toUpperCase() === "INPUT") return;
     runInAction(() => {
       globalStores.uiStore.selectedDesignTool = DesignTool.Ellipse;
     });
   });
 
-  keyboardJS.bind("y", () => {
+  keyboardJS.bind("y", (e: any) => {
+    if (e?.target?.tagName?.toUpperCase() === "INPUT") return;
     runInAction(() => {
       globalStores.uiStore.selectedDesignTool = DesignTool.Polygon;
     });
   });
 
-  keyboardJS.bind("l", () => {
+  keyboardJS.bind("l", (e: any) => {
+    if (e?.target?.tagName?.toUpperCase() === "INPUT") return;
     runInAction(() => {
       globalStores.uiStore.selectedDesignTool = DesignTool.Line;
     });
   });
 
-  keyboardJS.bind("p", () => {
+  keyboardJS.bind("p", (e: any) => {
+    if (e?.target?.tagName?.toUpperCase() === "INPUT") return;
     runInAction(() => {
       globalStores.uiStore.selectedDesignTool = DesignTool.Pen;
     });
   });
 
-  keyboardJS.bind("t", () => {
+  keyboardJS.bind("t", (e: any) => {
+    if (e?.target?.tagName?.toUpperCase() === "INPUT") return;
     runInAction(() => {
       globalStores.uiStore.selectedDesignTool = DesignTool.Text;
     });
   });
 
-  keyboardJS.bind("a", () => {
+  keyboardJS.bind("a", (e: any) => {
+    if (e?.target?.tagName?.toUpperCase() === "INPUT") return;
     runInAction(() => {
       globalStores.uiStore.selectedDesignTool = DesignTool.Artboard;
     });
   });
 
-  keyboardJS.bind("z", () => {
+  keyboardJS.bind("z", (e: any) => {
+    if (e?.target?.tagName?.toUpperCase() === "INPUT") return;
     runInAction(() => {
       globalStores.uiStore.selectedDesignTool = DesignTool.Zoom;
     });

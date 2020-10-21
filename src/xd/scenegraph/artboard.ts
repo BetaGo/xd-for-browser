@@ -115,6 +115,7 @@ export class Artboard extends GraphicNode {
   }
 
   addChild(node: SceneNode, index?: number) {
+    node.parent = this;
     if (index !== undefined) {
       this.children.splice(index, 0, node);
     } else {
@@ -122,6 +123,7 @@ export class Artboard extends GraphicNode {
     }
   }
   addChildAfter(node: SceneNode, relativeTo: SceneNode) {
+    node.parent = this;
     const index = this.children.indexOf(relativeTo);
     if (index === -1) {
       this.children.push(node);
@@ -130,6 +132,7 @@ export class Artboard extends GraphicNode {
     }
   }
   addChildBefore(node: SceneNode, relativeTo: SceneNode) {
+    node.parent = this;
     const index = this.children.indexOf(relativeTo);
     if (index === -1) {
       this.children.unshift(node);

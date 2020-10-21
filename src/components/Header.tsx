@@ -100,7 +100,7 @@ const Header = () => {
         </LeftActionItem>
       </LeftActions>
       <CenterActions>XD Tutorial</CenterActions>
-      <RightActions>{(canvasStore.scale * 100).toFixed(2)}%</RightActions>
+      <RightActions>{(canvasStore.zoomValue * 100).toFixed(2)}%</RightActions>
     </Root>
   );
 };

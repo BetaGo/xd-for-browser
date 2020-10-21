@@ -1,10 +1,13 @@
 import { runInAction } from "mobx";
+import { observer } from "mobx-react";
 import React, { useEffect, useRef } from "react";
 import { useHistory } from "react-router-dom";
 
+import { Artboard } from "../draw/elements/artboard";
 import { IPoint } from "../draw/utils";
 import { useStores } from "../hooks/useStores";
 import styled from "../styles/styled";
+import ArtboardTitle from "./canvas-controls/ArtboardTitle";
 import PositionTip from "./canvas-controls/PositionTip";
 import ResizeAndRotate from "./canvas-controls/ResizeAndRotate";
 import Selection from "./canvas-controls/Selection";
@@ -82,7 +85,7 @@ const Canvas = () => {
 
   const handleWheelEvent = (e: React.WheelEvent) => {
     if (e.altKey) {
-      const nextScale = canvasStore.gRender!.scale - (e.deltaY / 100) * 0.2;
+      const nextScale = canvasStore.zoomValue - (e.deltaY / 100) * 0.2;
       const rect = operationLayerRef.current!.getBoundingClientRect();
       const mousePoint: IPoint = {
         x: e.clientX - rect.x,
@@ -112,6 +115,9 @@ const Canvas = () => {
       ref={canvasContainerRef}
     >
       <OperationLayer ref={operationLayerRef}>
+        {canvasStore.artboards.map((v) => (
+          <ArtboardTitle artboard={v as Artboard} key={v.guid} />
+        ))}
         <Selection></Selection>
         <ResizeAndRotate></ResizeAndRotate>
         <PositionTip />
@@ -120,4 +126,4 @@ const Canvas = () => {
   );
 };
 
-export default Canvas;
+export default observer(Canvas);

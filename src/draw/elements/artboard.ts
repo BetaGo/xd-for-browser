@@ -8,7 +8,6 @@ import { IGRenderElement } from "./interface";
 
 export class Artboard extends XdArtboard implements IGRenderElement {
   render(gRender: GRender) {
-    this.renderTitle();
     const ctx = gRender.canvasCtx2D;
     ctx.save();
     ctx.transform(
@@ -33,17 +32,8 @@ export class Artboard extends XdArtboard implements IGRenderElement {
       if (this.fill instanceof ImageFill) {
         // TODO:
       }
-      ctx.fillRect(
-        this.globalBounds.x,
-        this.globalBounds.y,
-        this.width,
-        this.height
-      );
+      ctx.fillRect(0, 0, this.width, this.height);
     }
     ctx.restore();
-  }
-
-  renderTitle() {
-    // TODO: render editable title text
   }
 }
