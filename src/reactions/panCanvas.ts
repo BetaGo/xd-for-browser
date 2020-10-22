@@ -12,10 +12,10 @@ reaction(
   () => {
     return {
       mouseButton: canvasMouseStore.mouseButton,
-      mouseDownX: canvasMouseStore.mouseDownX,
-      mouseDownY: canvasMouseStore.mouseDownY,
-      currentMouseX: canvasMouseStore.currentMouseX,
-      currentMouseY: canvasMouseStore.currentMouseY,
+      mouseDownDomX: canvasMouseStore.mouseDownDomX,
+      mouseDownDomY: canvasMouseStore.mouseDownDomY,
+      currentMouseDomX: canvasMouseStore.currentMouseDomX,
+      currentMouseDomY: canvasMouseStore.currentMouseDomY,
       isMouseDown: canvasMouseStore.isMouseDown,
     };
   },
@@ -25,14 +25,19 @@ reaction(
       return;
     }
     if (!canvasStore.gRender?.transform) return;
-    const { mouseDownX, mouseDownY, currentMouseX, currentMouseY } = d;
+    const {
+      mouseDownDomX,
+      mouseDownDomY,
+      currentMouseDomX,
+      currentMouseDomY,
+    } = d;
 
     if (!transform) {
       transform = canvasStore.gRender.transform.clone();
     }
 
-    const deltaX = currentMouseX - mouseDownX!;
-    const deltaY = currentMouseY - mouseDownY!;
+    const deltaX = currentMouseDomX - mouseDownDomX!;
+    const deltaY = currentMouseDomY - mouseDownDomY!;
     const dpr = canvasStore.gRender.dpr;
     const tx = deltaX * dpr + transform.e;
     const ty = deltaY * dpr + transform.f;

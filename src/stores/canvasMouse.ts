@@ -11,12 +11,18 @@ export class CanvasMouseStore {
 
   mouseDownX?: number;
   mouseDownY?: number;
+  mouseDownDomX?: number;
+  mouseDownDomY?: number;
 
   currentMouseX: number = 0;
   currentMouseY: number = 0;
+  currentMouseDomX: number = 0;
+  currentMouseDomY: number = 0;
 
   mouseUpX?: number;
   mouseUpY?: number;
+  mouseUpDomX?: number;
+  mouseUpDomY?: number;
 
   get isMainButtonDown() {
     return this.mouseButton === MouseEventButton.Main && this.isMouseDown;

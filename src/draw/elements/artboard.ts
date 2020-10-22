@@ -4,6 +4,7 @@ import { ImageFill } from "../../xd/scenegraph/imageFill";
 import { LinearGradient } from "../../xd/scenegraph/linearGradient";
 import { RadialGradient } from "../../xd/scenegraph/radialGradient";
 import { GRender } from "../gRender";
+import { IPoint, pointInRegionWN } from "../utils";
 import { IGRenderElement } from "./interface";
 
 export class Artboard extends XdArtboard implements IGRenderElement {
@@ -35,5 +36,16 @@ export class Artboard extends XdArtboard implements IGRenderElement {
       ctx.fillRect(0, 0, this.width, this.height);
     }
     ctx.restore();
+  }
+
+  isInnerPoint(point: IPoint): boolean {
+    const region: IPoint[] = [
+      { x: this.transform.e, y: this.transform.f },
+      { x: this.transform.e + this.width, y: this.transform.f },
+      { x: this.transform.e + this.width, y: this.transform.f + this.height },
+      { x: this.transform.e, y: this.transform.f + this.height },
+      { x: this.transform.e, y: this.transform.f },
+    ];
+    return pointInRegionWN(point, region);
   }
 }

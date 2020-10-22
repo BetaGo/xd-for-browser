@@ -1,3 +1,3 @@
 import "./drawRectangle";
-import "./moveElement";
+// import "./moveElement";
 import "./panCanvas";

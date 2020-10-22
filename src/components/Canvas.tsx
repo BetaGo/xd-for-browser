@@ -1,6 +1,6 @@
 import { runInAction } from "mobx";
 import { observer } from "mobx-react";
-import React, { useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { useHistory } from "react-router-dom";
 
 import { Artboard } from "../draw/elements/artboard";
@@ -9,9 +9,9 @@ import { useStores } from "../hooks/useStores";
 import styled from "../styles/styled";
 import ArtboardTitle from "./canvas-controls/ArtboardTitle";
 import PositionTip from "./canvas-controls/PositionTip";
-import ResizeAndRotate from "./canvas-controls/ResizeAndRotate";
 import Selection from "./canvas-controls/Selection";
 
+// import ResizeAndRotate from "./canvas-controls/ResizeAndRotate";
 const Root = styled.div`
   position: relative;
   display: flex;
@@ -34,6 +34,25 @@ const Canvas = () => {
   const operationLayerRef = useRef<HTMLDivElement>(null);
   const history = useHistory();
 
+  const getCanvasPointFromEvent = useCallback(
+    (e: MouseEvent | React.WheelEvent | React.MouseEvent) => {
+      const rect = operationLayerRef.current!.getBoundingClientRect();
+      const domX = e.clientX - rect.x;
+      const tx = canvasStore.transform?.e ?? 0;
+      const domY = e.clientY - rect.y;
+      const ty = canvasStore.transform?.f ?? 0;
+      const x = (domX - tx / canvasStore.dpr) / canvasStore.zoomValue;
+      const y = (domY - ty / canvasStore.dpr) / canvasStore.zoomValue;
+      return { domX, domY, x, y };
+    },
+    [
+      canvasStore.dpr,
+      canvasStore.transform?.e,
+      canvasStore.transform?.f,
+      canvasStore.zoomValue,
+    ]
+  );
+
   useEffect(() => {
     if (!projectStore.rootNode) {
       history.replace("/");
@@ -48,12 +67,13 @@ const Canvas = () => {
   useEffect(() => {
     let mouseMoveDetectTimer: ReturnType<typeof setTimeout>;
     const handleMouseMove = (e: MouseEvent) => {
-      const rect = operationLayerRef.current!.getBoundingClientRect();
-
+      const point = getCanvasPointFromEvent(e);
       canvasMouseStore.update({
         isMouseMoving: true,
-        currentMouseX: e.clientX - rect.x,
-        currentMouseY: e.clientY - rect.y,
+        currentMouseX: point.x,
+        currentMouseY: point.y,
+        currentMouseDomX: point.domX,
+        currentMouseDomY: point.domY,
       });
       mouseMoveDetectTimer && clearTimeout(mouseMoveDetectTimer);
       mouseMoveDetectTimer = setTimeout(() => {
@@ -63,14 +83,15 @@ const Canvas = () => {
       }, 500);
     };
     const handleMouseUp = (e: MouseEvent) => {
-      const rect = operationLayerRef.current!.getBoundingClientRect();
-
+      const point = getCanvasPointFromEvent(e);
       canvasMouseStore.update({
         isMouseDown: false,
         isMouseMoving: false,
         mouseButton: e.button,
-        mouseUpX: e.clientX - rect.x,
-        mouseUpY: e.clientY - rect.y,
+        mouseUpX: point.x,
+        mouseUpY: point.y,
+        mouseUpDomX: point.domX,
+        mouseUpDomY: point.domY,
       });
     };
     window.addEventListener("mousemove", handleMouseMove);
@@ -81,20 +102,21 @@ const Canvas = () => {
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [canvasMouseStore]);
+  }, [canvasMouseStore, getCanvasPointFromEvent]);
 
   const handleWheelEvent = (e: React.WheelEvent) => {
     if (e.altKey) {
       const nextScale = canvasStore.zoomValue - (e.deltaY / 100) * 0.2;
-      const rect = operationLayerRef.current!.getBoundingClientRect();
+      const point = getCanvasPointFromEvent(e);
       const mousePoint: IPoint = {
-        x: e.clientX - rect.x,
-        y: e.clientY - rect.y,
+        x: point.domX,
+        y: point.domY,
       };
+      console.log(point);
       canvasStore.zoom(nextScale, mousePoint);
     } else {
       const scrollY = -e.deltaY;
-      canvasStore.gRender?.transform.translate(0, scrollY);
+      canvasStore.gRender?.translate(0, scrollY);
       canvasStore.render();
     }
   };
@@ -102,13 +124,15 @@ const Canvas = () => {
   return (
     <Root
       onMouseDown={(e) => {
-        const rect = operationLayerRef.current!.getBoundingClientRect();
+        const point = getCanvasPointFromEvent(e);
         canvasMouseStore.update({
           isMouseDown: true,
           isMouseMoving: false,
           mouseButton: e.button,
-          mouseDownX: e.clientX - rect.x,
-          mouseDownY: e.clientY - rect.y,
+          mouseDownX: point.x,
+          mouseDownY: point.y,
+          mouseDownDomX: point.domX,
+          mouseDownDomY: point.domY,
         });
       }}
       onWheel={handleWheelEvent}
@@ -119,7 +143,7 @@ const Canvas = () => {
           <ArtboardTitle artboard={v as Artboard} key={v.guid} />
         ))}
         <Selection></Selection>
-        <ResizeAndRotate></ResizeAndRotate>
+        {/* <ResizeAndRotate></ResizeAndRotate> */}
         <PositionTip />
       </OperationLayer>
     </Root>

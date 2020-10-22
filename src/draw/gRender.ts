@@ -65,14 +65,15 @@ export class GRender {
     this.canvasResizeObserver.observe(this.canvasElement);
   }
 
+  translate(tx: number, ty: number) {
+    const x = tx * this.dpr;
+    const y = ty * this.dpr;
+    this.transform.translate(x, y);
+  }
+
   scale(value: number, center?: IPoint) {
     if (center) {
-      this.transform.scale(
-        value,
-        value,
-        center.x * this.dpr - this.transform.e,
-        center.y * this.dpr - this.transform.f
-      );
+      this.transform.scale(value, value, center.x, center.y);
     } else {
       this.transform.scale(value);
     }
