@@ -141,6 +141,7 @@ export class Artboard extends GraphicNode {
     }
   }
   removeAllChildren() {
+    this.children.forEach((v) => (v.parent = null));
     this.children.length = 0;
   }
   dynamicLayout?: boolean;

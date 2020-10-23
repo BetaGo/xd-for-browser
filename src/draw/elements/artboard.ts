@@ -3,11 +3,13 @@ import { Color } from "../../xd/scenegraph/color";
 import { ImageFill } from "../../xd/scenegraph/imageFill";
 import { LinearGradient } from "../../xd/scenegraph/linearGradient";
 import { RadialGradient } from "../../xd/scenegraph/radialGradient";
+import { SceneNode } from "../../xd/scenegraph/sceneNode";
 import { GRender } from "../gRender";
 import { IPoint, pointInRegionWN } from "../utils";
 import { IGRenderElement } from "./interface";
 
 export class Artboard extends XdArtboard implements IGRenderElement {
+  children: Array<SceneNode & IGRenderElement> = [];
   render(gRender: GRender) {
     const ctx = gRender.canvasCtx2D;
     ctx.save();
@@ -36,6 +38,9 @@ export class Artboard extends XdArtboard implements IGRenderElement {
       ctx.fillRect(0, 0, this.width, this.height);
     }
     ctx.restore();
+    this.children.forEach((e) => {
+      e.render(gRender);
+    });
   }
 
   isInnerPoint(point: IPoint): boolean {

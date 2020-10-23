@@ -103,8 +103,11 @@ export class Rectangle extends GraphicNode {
     throw new Error("Method not implemented.");
   }
   removeFromParent(): void {
-    // TODO:
-    throw new Error("Method not implemented.");
+    const idx = this.parent?.children.indexOf(this) ?? -1;
+    if (idx !== -1) {
+      this.parent?.children.splice(idx, 1);
+    }
+    this.parent = null;
   }
   moveInParentCoordinates(deltaX: number, deltaY: number): void {
     // TODO:

@@ -26,24 +26,23 @@ const Selection = () => {
 
   if (
     uiStore.selectedDesignTool !== DesignTool.Select ||
-    !canvasMouseStore.isMouseDown ||
-    canvasMouseStore.mouseButton !== MouseEventButton.Main ||
+    !canvasMouseStore.isMainButtonDown ||
     (canvasMouseStore.isMouseDown && canvasStore.selectedElement)
   ) {
     return null;
   }
 
   const {
-    mouseDownX,
-    mouseDownY,
-    currentMouseX,
-    currentMouseY,
+    mouseDownDomX,
+    mouseDownDomY,
+    currentMouseDomX,
+    currentMouseDomY,
   } = canvasMouseStore;
 
-  const left = Math.min(mouseDownX!, currentMouseX);
-  const top = Math.min(mouseDownY!, currentMouseY);
-  const width = Math.abs(mouseDownX! - currentMouseX);
-  const height = Math.abs(mouseDownY! - currentMouseY);
+  const left = Math.min(mouseDownDomX!, currentMouseDomX);
+  const top = Math.min(mouseDownDomY!, currentMouseDomY);
+  const width = Math.abs(mouseDownDomX! - currentMouseDomX);
+  const height = Math.abs(mouseDownDomY! - currentMouseDomY);
 
   return (
     <Root

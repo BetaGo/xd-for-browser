@@ -41,7 +41,7 @@ export class Rectangle extends XdRectangle implements IGRenderElement {
     if (this.strokeEnabled && this.stroke) {
       ctx.lineWidth = this.strokeWidth;
       ctx.strokeStyle = this.stroke.string();
-      ctx.stroke();
+      ctx.strokeRect(0, 0, this.width, this.height);
     }
     ctx.restore();
   }

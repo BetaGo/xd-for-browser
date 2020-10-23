@@ -82,6 +82,7 @@ export class RootNode extends SceneNode {
   }
 
   addChild(node: SceneNode, index?: number): void {
+    node.parent = this;
     if (index !== undefined) {
       this.children.splice(index, 0, node);
     } else {
@@ -89,6 +90,7 @@ export class RootNode extends SceneNode {
     }
   }
   addChildAfter(node: SceneNode, relativeTo: SceneNode): void {
+    node.parent = this;
     const index = this.children.indexOf(relativeTo);
     if (index === -1) {
       this.children.push(node);
@@ -97,6 +99,7 @@ export class RootNode extends SceneNode {
     }
   }
   addChildBefore(node: SceneNode, relativeTo: SceneNode): void {
+    node.parent = this;
     const index = this.children.indexOf(relativeTo);
     if (index === -1) {
       this.children.unshift(node);
@@ -105,6 +108,7 @@ export class RootNode extends SceneNode {
     }
   }
   removeAllChildren(): void {
+    this.children.forEach((v) => (v.parent = null));
     this.children.length = 0;
   }
 }
