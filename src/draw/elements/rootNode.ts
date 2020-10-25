@@ -7,9 +7,16 @@ export class RootNode extends XdRootNode implements IGRenderElement {
   children: Array<SceneNode & IGRenderElement> = [];
 
   render(gRender: GRender) {
-    this.children.forEach((e) => {
-      e.render(gRender);
-    });
+    const renderQueue = this.children.slice();
+    while (renderQueue.length) {
+      const current = renderQueue.shift();
+      if (current?.children.length) {
+        renderQueue.push(
+          ...(current.children as Array<SceneNode & IGRenderElement>)
+        );
+      }
+      current?.render(gRender);
+    }
   }
 
   isInnerPoint() {
