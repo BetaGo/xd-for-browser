@@ -1,7 +1,7 @@
 import { observer } from "mobx-react";
 import React from "react";
 
-import { DesignTool, MouseEventButton } from "../../constants";
+import { DesignTool } from "../../constants";
 import { useStores } from "../../hooks/useStores";
 import styled from "../../styles/styled";
 

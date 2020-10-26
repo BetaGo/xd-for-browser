@@ -3,7 +3,7 @@
  */
 // TODO: ImageFill
 export class ImageFill {
-  constructor(fileOrDataURI: File | string) {
+  constructor(public fileOrDataURI: File | string) {
     // TODO:
   }
 }

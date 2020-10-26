@@ -1,15 +1,20 @@
-import { IGRenderElement } from "./interface";
-import { Rectangle as XdRectangle } from "../../xd/scenegraph/rectangle";
-import { GRender } from "../gRender";
-import { SceneNode } from "../../xd/scenegraph/sceneNode";
-import { IPoint } from "../utils";
 import { Color } from "../../xd/scenegraph/color";
+import { ImageFill } from "../../xd/scenegraph/imageFill";
 import { LinearGradient } from "../../xd/scenegraph/linearGradient";
 import { RadialGradient } from "../../xd/scenegraph/radialGradient";
-import { ImageFill } from "../../xd/scenegraph/imageFill";
+import { Rectangle as XdRectangle } from "../../xd/scenegraph/rectangle";
+import { SceneNode } from "../../xd/scenegraph/sceneNode";
+import { MixinRenderEventTarget } from "../event";
+import { GRender } from "../gRender";
+import { IPoint, pointInRegionWN } from "../utils";
+import { IGRenderElement } from "./interface";
 
-export class Rectangle extends XdRectangle implements IGRenderElement {
+export class Rectangle
+  extends MixinRenderEventTarget(XdRectangle)
+  implements IGRenderElement {
+  parent: (SceneNode & IGRenderElement) | null = null;
   children: Array<SceneNode & IGRenderElement> = [];
+
   strokeEnabled = true;
   render(gRender: GRender) {
     const ctx = gRender.canvasCtx2D;
@@ -46,7 +51,18 @@ export class Rectangle extends XdRectangle implements IGRenderElement {
     ctx.restore();
   }
   isInnerPoint(point: IPoint) {
-    // TODO:
-    return false;
+    const region: IPoint[] = [
+      { x: 0, y: 0 },
+      { x: 0 + this.width, y: 0 },
+      { x: 0 + this.width, y: 0 + this.height },
+      { x: 0, y: 0 + this.height },
+      { x: 0, y: 0 },
+    ];
+
+    const transformedRegion = region.map((v) => {
+      return this.transform.transformPoint(v);
+    });
+
+    return pointInRegionWN(point, transformedRegion);
   }
 }

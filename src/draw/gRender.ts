@@ -4,7 +4,9 @@ import ResizeObserver from "resize-observer-polyfill";
 import { MouseEventButton } from "../constants";
 import { createIdentityMatrix, Matrix } from "../xd/scenegraph/matrix";
 import { Element } from "./element";
+import { IGRenderElement } from "./elements/interface";
 import { RootNode } from "./elements/rootNode";
+import { RenderMouseEvent } from "./event";
 import { IGRenderEventMap } from "./events";
 import { IPoint, setupCanvas } from "./utils";
 
@@ -12,13 +14,16 @@ export class GRender {
   static init(container: HTMLElement) {
     return new GRender(container);
   }
+  static MAX_ZOOM_VALUE = 64;
+  static MIN_ZOOM_VALUE = 0.025;
 
   containerElement: HTMLElement;
   canvasElement: HTMLCanvasElement;
   canvasCtx2D: CanvasRenderingContext2D;
-  rootNode: RootNode | null = null;
+  rootNode = new RootNode();
   eventEmitter = new EventEmitter();
   transform: Matrix;
+  zoomValue = 1;
 
   private canvasResizeObserver = new ResizeObserver((entries) => {
     for (const entry of entries) {
@@ -79,6 +84,20 @@ export class GRender {
     }
   }
 
+  zoom(value: number, center?: IPoint) {
+    const v = Math.min(
+      Math.max(value, GRender.MIN_ZOOM_VALUE),
+      GRender.MAX_ZOOM_VALUE
+    );
+    const scaleValue = v / this.zoomValue;
+    if (center) {
+      center.x = center.x * this.dpr - (this.transform.e ?? 0);
+      center.y = center.y * this.dpr - (this.transform.f ?? 0);
+    }
+    this.scale(scaleValue, center);
+    this.zoomValue = v;
+  }
+
   resizeCanvas() {
     this.canvasCtx2D = setupCanvas(this.canvasElement)!;
   }
@@ -134,6 +153,17 @@ export class GRender {
     return;
   }
 
+  getCanvasPointFromEvent = (e: MouseEvent) => {
+    const rect = this.canvasElement.getBoundingClientRect();
+    const domX = e.clientX - rect.x;
+    const tx = this.transform.e ?? 0;
+    const domY = e.clientY - rect.y;
+    const ty = this.transform.f ?? 0;
+    const x = (domX - tx / this.dpr) / this.zoomValue;
+    const y = (domY - ty / this.dpr) / this.zoomValue;
+    return { domX, domY, x, y };
+  };
+
   listenCanvasDomEvents() {
     const mouseEventList: Array<
       keyof Pick<
@@ -143,23 +173,39 @@ export class GRender {
     > = ["click", "mousedown", "mouseup", "mousemove"];
     mouseEventList.forEach((eventType) => {
       this.canvasElement.addEventListener(eventType, (e) => {
-        const s = this.canvasElement.getBoundingClientRect();
-        let point: IPoint = {
-          x: e.clientX - s.x,
-          y: e.clientY - s.y,
-        };
+        let point: IPoint = this.getCanvasPointFromEvent(e);
+        const path: IGRenderElement[] = [];
+        let captureQueue: IGRenderElement[] = [this.rootNode];
 
-        let targetElement = this.getElementFromPoint(point);
-        targetElement?.emit(eventType, {
-          type: eventType,
-          target: targetElement,
-          browserMouseEvent: e,
-        });
-        this.eventEmitter.emit(eventType, {
-          type: eventType,
-          target: targetElement,
-          browserMouseEvent: e,
-        });
+        while (captureQueue.length) {
+          const current = captureQueue.shift();
+          if (current?.isInnerPoint(point)) {
+            path.push(current);
+            captureQueue = current.children.slice().reverse();
+          }
+        }
+
+        path.reverse();
+
+        let evt = new RenderMouseEvent(eventType);
+        evt.target = path[0];
+        evt.path = path;
+        evt.button = e.button;
+        // capture
+        for (let i = path.length - 1; i >= 0; i--) {
+          if (evt.stoppedPropagation) return;
+          const current = path[i];
+          evt.currentTarget = current;
+          current.dispatchEvent(evt, "capture");
+        }
+
+        // bubble
+        for (let i = 0; i < path.length; i++) {
+          if (evt.stoppedPropagation) return;
+          const current = path[i];
+          evt.currentTarget = current;
+          current.dispatchEvent(evt, "bubble");
+        }
       });
     });
   }

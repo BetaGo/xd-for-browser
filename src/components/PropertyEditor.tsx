@@ -1,6 +1,6 @@
 import { observer } from "mobx-react";
 import React from "react";
-import { useStores } from "../hooks/useStores";
+// import { useStores } from "../hooks/useStores";
 import styled from "../styles/styled";
 // import SizeAndPosition from "./property-edit/SizeAndPosition";
 
@@ -10,7 +10,7 @@ const Root = styled.div`
 `;
 
 const PropertyEditor = () => {
-  const { canvasStore } = useStores();
+  // const { canvasStore } = useStores();
   return (
     <Root>
       {/* <SizeAndPosition /> */}

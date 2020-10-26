@@ -1,4 +1,10 @@
-import { makeAutoObservable, makeObservable, observable } from "mobx";
+import {
+  makeAutoObservable,
+  makeObservable,
+  observable,
+  runInAction,
+} from "mobx";
+import { MouseEventButton } from "../constants";
 
 import { Artboard } from "../draw/elements/artboard";
 import { RootNode } from "../draw/elements/rootNode";
@@ -12,6 +18,7 @@ class GRenderObservable extends GRender {
     super(container);
     makeObservable(this, {
       dpr: observable,
+      zoomValue: observable,
       rootNode: observable,
     });
   }
@@ -19,11 +26,13 @@ class GRenderObservable extends GRender {
 
 export class CanvasStore {
   gRender: GRender | null = null;
-  selectedElement?: SceneNode;
+  selectedElement: SceneNode | null = null;
 
   transform?: Matrix;
 
-  zoomValue = 1;
+  get zoomValue() {
+    return this.gRender?.zoomValue ?? 1;
+  }
 
   get artboards(): Artboard[] {
     return (this.gRender?.rootNode?.children || []).filter(
@@ -40,19 +49,7 @@ export class CanvasStore {
   }
 
   zoom(value: number, center?: IPoint) {
-    const minValue = 0.025;
-    const maxValue = 64;
-    const v = Math.min(Math.max(value, minValue), maxValue);
-    const scaleValue = v / this.zoomValue;
-    if (center) {
-      center.x = center.x * this.dpr - (this.transform?.e ?? 0);
-      center.y = center.y * this.dpr - (this.transform?.f ?? 0);
-      console.log("c:", center);
-    }
-
-    this.gRender?.scale(scaleValue, center);
-    // this.gRender?.scale(scaleValue);
-    this.zoomValue = v;
+    this.gRender?.zoom(value, center);
     this.render();
   }
 
@@ -60,7 +57,20 @@ export class CanvasStore {
     this.gRender = new GRenderObservable(element);
     this.gRender.rootNode = rootNode;
     this.gRender.translate(100, 100);
-    // this.zoom(0.8);
+    this.zoom(0.8);
+
+    rootNode.addEventListener("mousedown", (e) => {
+      if (e.button === MouseEventButton.Main) {
+        runInAction(() => {
+          if (e.target instanceof SceneNode) {
+            this.selectedElement = e.target;
+            console.log(e.target);
+          } else {
+            this.selectedElement = null;
+          }
+        });
+      }
+    });
 
     // this.gRender.on("mousedown", (e) => {
     //   if (e.browserMouseEvent.button === MouseEventButton.Main) {
