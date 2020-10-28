@@ -7,6 +7,7 @@ import {
 import { MouseEventButton } from "../constants";
 
 import { Artboard } from "../draw/elements/artboard";
+import { IGRenderElement } from "../draw/elements/interface";
 import { RootNode } from "../draw/elements/rootNode";
 import { GRender } from "../draw/gRender";
 import { IPoint } from "../draw/utils";
@@ -27,6 +28,7 @@ class GRenderObservable extends GRender {
 export class CanvasStore {
   gRender: GRender | null = null;
   selectedElement: SceneNode | null = null;
+  selectedElements: Set<SceneNode> = new Set();
 
   transform?: Matrix;
 
@@ -58,27 +60,6 @@ export class CanvasStore {
     this.gRender.rootNode = rootNode;
     this.gRender.translate(100, 100);
     this.zoom(0.8);
-
-    rootNode.addEventListener("mousedown", (e) => {
-      if (e.button === MouseEventButton.Main) {
-        runInAction(() => {
-          if (e.target instanceof SceneNode) {
-            this.selectedElement = e.target;
-            console.log(e.target);
-          } else {
-            this.selectedElement = null;
-          }
-        });
-      }
-    });
-
-    // this.gRender.on("mousedown", (e) => {
-    //   if (e.browserMouseEvent.button === MouseEventButton.Main) {
-    //     runInAction(() => {
-    //       this.selectedElement = e.target;
-    //     });
-    //   }
-    // });
 
     this.gRender.on("resize", (e) => {
       this.render();

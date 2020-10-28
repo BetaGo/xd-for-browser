@@ -191,6 +191,10 @@ export class GRender {
         evt.target = path[0];
         evt.path = path;
         evt.button = e.button;
+        evt.altKey = e.altKey;
+        evt.ctrlKey = e.ctrlKey;
+        evt.metaKey = e.metaKey;
+        evt.shiftKey = e.shiftKey;
         // capture
         for (let i = path.length - 1; i >= 0; i--) {
           if (evt.stoppedPropagation) return;

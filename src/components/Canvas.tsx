@@ -9,9 +9,9 @@ import { useStores } from "../hooks/useStores";
 import styled from "../styles/styled";
 import ArtboardTitle from "./canvas-controls/ArtboardTitle";
 import PositionTip from "./canvas-controls/PositionTip";
+import ResizeAndRotate from "./canvas-controls/ResizeAndRotate";
 import Selection from "./canvas-controls/Selection";
 
-// import ResizeAndRotate from "./canvas-controls/ResizeAndRotate";
 const Root = styled.div`
   position: relative;
   display: flex;
@@ -143,7 +143,7 @@ const Canvas = () => {
           <ArtboardTitle artboard={v as Artboard} key={v.guid} />
         ))}
         <Selection></Selection>
-        {/* <ResizeAndRotate></ResizeAndRotate> */}
+        <ResizeAndRotate></ResizeAndRotate>
         <PositionTip />
       </OperationLayer>
     </Root>

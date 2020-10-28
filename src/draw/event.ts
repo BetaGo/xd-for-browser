@@ -28,6 +28,10 @@ export class RenderEvent {
 
 export class RenderMouseEvent extends RenderEvent {
   button: MouseEventButton = MouseEventButton.Main;
+  altKey: boolean = false;
+  ctrlKey: boolean = false;
+  metaKey: boolean = false;
+  shiftKey: boolean = false;
 }
 
 export interface RenderEventListener {
