@@ -1,11 +1,11 @@
 import { observer } from "mobx-react";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 import { DesignTool, MouseEventButton } from "../../constants";
 import { Artboard } from "../../draw/elements/artboard";
 import { IGRenderElement } from "../../draw/elements/interface";
 import { RootNode } from "../../draw/elements/rootNode";
-import { RenderMouseEvent } from "../../draw/event";
+import { IRenderEventTarget, RenderMouseEvent } from "../../draw/event";
 import { useStores } from "../../hooks/useStores";
 import styled from "../../styles/styled";
 import { SceneNode } from "../../xd/scenegraph/sceneNode";
@@ -28,10 +28,15 @@ const Root = styled.div`
 
 const Selection = () => {
   const { uiStore, canvasMouseStore, canvasStore } = useStores();
+  const [
+    mousedownElement,
+    setMousedownElement,
+  ] = useState<IRenderEventTarget | null>(null);
 
   useEffect(() => {
     const handleMousedown = (e: RenderMouseEvent) => {
       if (e.button !== MouseEventButton.Main) return;
+      setMousedownElement(e.target);
       if (e.target instanceof Artboard || e.target instanceof RootNode) {
         // TODO:
         canvasStore.selectedElements.clear();
@@ -53,14 +58,24 @@ const Selection = () => {
         }
       }
     };
+
+    const handleMouseup = (e: RenderMouseEvent) => {
+      setMousedownElement(null);
+    };
     canvasStore.gRender?.rootNode.addEventListener(
       "mousedown",
       handleMousedown
     );
+
+    canvasStore.gRender?.rootNode.addEventListener("mouseup", handleMouseup);
     return () => {
       canvasStore.gRender?.rootNode.removeEventListener(
         "mousedown",
         handleMousedown
+      );
+      canvasStore.gRender?.rootNode.removeEventListener(
+        "mouseup",
+        handleMouseup
       );
     };
   }, [canvasStore.gRender?.rootNode, canvasStore.selectedElements]);
@@ -68,7 +83,11 @@ const Selection = () => {
   if (
     uiStore.selectedDesignTool !== DesignTool.Select ||
     !canvasMouseStore.isMainButtonDown ||
-    (canvasMouseStore.isMouseDown && canvasStore.selectedElement)
+    !mousedownElement ||
+    !(
+      mousedownElement instanceof RootNode ||
+      mousedownElement instanceof Artboard
+    )
   ) {
     return null;
   }

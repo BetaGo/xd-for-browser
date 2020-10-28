@@ -96,5 +96,6 @@ export function MixinRenderEventTarget<TBase extends Constructor>(Base: TBase) {
 export interface IRenderEventMap {
   click: RenderMouseEvent;
   mousedown: RenderMouseEvent;
+  mouseup: RenderMouseEvent;
   mousemove: RenderMouseEvent;
 }

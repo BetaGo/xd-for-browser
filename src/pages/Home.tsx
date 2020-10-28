@@ -1,97 +1,72 @@
-import { View } from "@adobe/react-spectrum";
+import { Divider } from "@adobe/react-spectrum";
 import React from "react";
-import { useStores } from "../hooks/useStores";
 
+import Canvas from "../components/Canvas";
+import Header from "../components/Header";
+import PropertyEditor from "../components/PropertyEditor";
+import ToolBox from "../components/ToolBox";
 import styled from "../styles/styled";
-import { RootNode } from "../draw/elements/rootNode";
-import { Artboard } from "../draw/elements/artboard";
-import { useHistory } from "react-router-dom";
-import { Color } from "../xd/scenegraph/color";
 
-const Root = styled.div`
+const GridRoot = styled.div`
   width: 100%;
   height: 100%;
-  display: flex;
-  flex-wrap: wrap;
-  background-color: rgb(228, 228, 228);
+  display: grid;
+  grid-template-columns: 50px auto 292px;
+  grid-template-rows: 42px auto;
+  /**
+  * prevent-content-from-expanding-grid-items
+  * @see https://stackoverflow.com/a/43312314/9642423
+  **/
+  min-height: 0;
+  min-width: 0;
 `;
 
-const Template = styled.div`
-  display: flex;
-  justify-content: space-evenly;
-  align-items: center;
-  height: 360px;
-  margin: auto;
-  padding: 0 16px;
-  background-color: ${({ theme }) => theme.palette.background.default};
+const HeaderGridItem = styled.div`
+  grid-column: 1 / 4;
+  grid-row: 1;
 `;
 
-const TemplateItem = styled.div`
-  width: 200px;
-  height: 180px;
+const ToolBoxGridItem = styled.div`
   display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  cursor: pointer;
-  border-radius: 12px;
-
-  &:hover {
-    background-color: ${({ theme }) => theme.palette.background.hover};
-  }
+  grid-column: 1 / 2;
+  grid-row: 2 / 3;
+  overflow: hidden;
 `;
 
-const Home = () => {
-  const { projectStore } = useStores();
-  const history = useHistory();
-  const handleCreateProject = (width: number, height: number) => {
-    const rootNode = new RootNode();
+const CanvasGridItem = styled.div`
+  display: flex;
+  grid-column: 2 / 3;
+  grid-row: 2 / 3;
+  overflow: hidden;
+`;
 
-    const initialArtboard = new Artboard();
-    initialArtboard.name = "hello";
-    initialArtboard.width = width;
-    initialArtboard.height = height;
-    initialArtboard.fill = new Color("#fff");
+const PropertyEditorGridItem = styled.div`
+  display: flex;
+  grid-column: 3 / 4;
+  grid-row: 2 / 3;
+  overflow: hidden;
+`;
 
-    const artboard2 = new Artboard();
-    artboard2.name = "artboard 2";
-    artboard2.width = width;
-    artboard2.height = height;
-    artboard2.fill = new Color("#fff");
-    artboard2.transform.translate(width + 100, 0);
-
-    rootNode.addChild(initialArtboard);
-    rootNode.addChild(artboard2);
-    projectStore.rootNode = rootNode;
-    history.replace("/design");
-  };
-
+const HomePage = () => {
   return (
-    <Root>
-      <Template>
-        <TemplateItem
-          onClick={() => {
-            handleCreateProject(375, 812);
-          }}
-        >
-          <View>
-            <div>iPhone X/XS/11 Pro</div>
-            <div>375 x 812 px</div>
-          </View>
-        </TemplateItem>
-        <TemplateItem
-          onClick={() => {
-            handleCreateProject(1920, 1080);
-          }}
-        >
-          <View>
-            <div>Web 1920</div>
-            <div>1920 x 1080 px</div>
-          </View>
-        </TemplateItem>
-      </Template>
-    </Root>
+    <GridRoot>
+      <HeaderGridItem>
+        <Header />
+        <Divider size="M" />
+      </HeaderGridItem>
+      <ToolBoxGridItem>
+        <ToolBox />
+        <Divider orientation="vertical" size="M" />
+      </ToolBoxGridItem>
+      <CanvasGridItem>
+        <Canvas />
+      </CanvasGridItem>
+      <PropertyEditorGridItem>
+        <Divider orientation="vertical" size="M" />
+        <PropertyEditor />
+      </PropertyEditorGridItem>
+    </GridRoot>
   );
 };
 
-export default Home;
+export default HomePage;

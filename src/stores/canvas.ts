@@ -1,13 +1,6 @@
-import {
-  makeAutoObservable,
-  makeObservable,
-  observable,
-  runInAction,
-} from "mobx";
-import { MouseEventButton } from "../constants";
+import { makeAutoObservable, makeObservable, observable } from "mobx";
 
 import { Artboard } from "../draw/elements/artboard";
-import { IGRenderElement } from "../draw/elements/interface";
 import { RootNode } from "../draw/elements/rootNode";
 import { GRender } from "../draw/gRender";
 import { IPoint } from "../draw/utils";
@@ -27,7 +20,6 @@ class GRenderObservable extends GRender {
 
 export class CanvasStore {
   gRender: GRender | null = null;
-  selectedElement: SceneNode | null = null;
   selectedElements: Set<SceneNode> = new Set();
 
   transform?: Matrix;

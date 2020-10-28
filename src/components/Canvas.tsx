@@ -1,6 +1,7 @@
 import { runInAction } from "mobx";
 import { observer } from "mobx-react";
 import React, { useCallback, useEffect, useRef } from "react";
+import { ContextMenuTrigger } from "react-contextmenu";
 import { useHistory } from "react-router-dom";
 
 import { Artboard } from "../draw/elements/artboard";
@@ -11,21 +12,26 @@ import ArtboardTitle from "./canvas-controls/ArtboardTitle";
 import PositionTip from "./canvas-controls/PositionTip";
 import ResizeAndRotate from "./canvas-controls/ResizeAndRotate";
 import Selection from "./canvas-controls/Selection";
+import CanvasContextMenu from "./CanvasContextMenu";
 
 const Root = styled.div`
   position: relative;
   display: flex;
   flex: 1;
+  background-color: RGB(228, 228, 228);
 `;
 
-const OperationLayer = styled.div`
-  pointer-events: none;
+const CanvasContainer = styled.div`
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
   overflow: hidden;
+`;
+
+const OperationLayer = styled(CanvasContainer)`
+  pointer-events: none;
 `;
 
 const Canvas = () => {
@@ -104,40 +110,52 @@ const Canvas = () => {
     };
   }, [canvasMouseStore, getCanvasPointFromEvent]);
 
-  const handleWheelEvent = (e: React.WheelEvent) => {
-    if (e.altKey) {
-      const nextScale = canvasStore.zoomValue - (e.deltaY / 100) * 0.2;
-      const point = getCanvasPointFromEvent(e);
-      const mousePoint: IPoint = {
-        x: point.domX,
-        y: point.domY,
-      };
-      console.log(point);
-      canvasStore.zoom(nextScale, mousePoint);
-    } else {
-      const scrollY = -e.deltaY;
-      canvasStore.gRender?.translate(0, scrollY);
-      canvasStore.render();
-    }
-  };
+  useEffect(() => {
+    const handleWheelEvent = (e: WheelEvent) => {
+      e.preventDefault();
+      if (e.altKey || e.ctrlKey) {
+        const nextScale = canvasStore.zoomValue - (e.deltaY / 100) * 0.2;
+        const point = getCanvasPointFromEvent(e);
+        const mousePoint: IPoint = {
+          x: point.domX,
+          y: point.domY,
+        };
+        canvasStore.zoom(nextScale, mousePoint);
+      } else {
+        const scrollY = -e.deltaY;
+        canvasStore.gRender?.translate(0, scrollY);
+        canvasStore.render();
+      }
+    };
+    const element = canvasContainerRef.current;
+    element?.addEventListener("wheel", handleWheelEvent, {
+      passive: false,
+    });
+
+    return () => {
+      element?.removeEventListener("wheel", handleWheelEvent);
+    };
+  }, [canvasStore, getCanvasPointFromEvent]);
 
   return (
-    <Root
-      onMouseDown={(e) => {
-        const point = getCanvasPointFromEvent(e);
-        canvasMouseStore.update({
-          isMouseDown: true,
-          isMouseMoving: false,
-          mouseButton: e.button,
-          mouseDownX: point.x,
-          mouseDownY: point.y,
-          mouseDownDomX: point.domX,
-          mouseDownDomY: point.domY,
-        });
-      }}
-      onWheel={handleWheelEvent}
-      ref={canvasContainerRef}
-    >
+    <Root>
+      <ContextMenuTrigger id="canvas_menu" holdToDisplay={-1}>
+        <CanvasContainer
+          onMouseDown={(e) => {
+            const point = getCanvasPointFromEvent(e);
+            canvasMouseStore.update({
+              isMouseDown: true,
+              isMouseMoving: false,
+              mouseButton: e.button,
+              mouseDownX: point.x,
+              mouseDownY: point.y,
+              mouseDownDomX: point.domX,
+              mouseDownDomY: point.domY,
+            });
+          }}
+          ref={canvasContainerRef}
+        />
+      </ContextMenuTrigger>
       <OperationLayer ref={operationLayerRef}>
         {canvasStore.artboards.map((v) => (
           <ArtboardTitle artboard={v as Artboard} key={v.guid} />
@@ -146,6 +164,7 @@ const Canvas = () => {
         <ResizeAndRotate></ResizeAndRotate>
         <PositionTip />
       </OperationLayer>
+      <CanvasContextMenu />
     </Root>
   );
 };

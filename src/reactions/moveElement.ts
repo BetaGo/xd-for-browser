@@ -3,16 +3,18 @@ import { reaction } from "mobx";
 import { DesignTool } from "../constants";
 import { globalStores } from "../contexts";
 import { Matrix } from "../xd/scenegraph/matrix";
+import { SceneNode } from "../xd/scenegraph/sceneNode";
 
 const { uiStore, canvasStore, canvasMouseStore } = globalStores;
 
-let transform: Matrix | null = null;
+let transformList: Matrix[] = [];
+let transformMap: WeakMap<Matrix, SceneNode> = new WeakMap();
 
 reaction(
   () => {
     return {
       selectedDesignTool: uiStore.selectedDesignTool,
-      selectedElement: canvasStore.selectedElement,
+      selectedElements: canvasStore.selectedElements,
       mouseDownX: canvasMouseStore.mouseDownX,
       mouseDownY: canvasMouseStore.mouseDownY,
       currentMouseX: canvasMouseStore.currentMouseX,
@@ -25,10 +27,13 @@ reaction(
 
     if (
       d.selectedDesignTool !== DesignTool.Select ||
-      !d.selectedElement ||
+      !d.selectedElements.size ||
       !d.isMainButtonDown
     ) {
-      transform = null;
+      transformList.forEach((v) => {
+        transformMap.delete(v);
+      });
+      transformList = [];
       return;
     }
 
@@ -37,24 +42,32 @@ reaction(
       mouseDownY,
       currentMouseX,
       currentMouseY,
-      selectedElement,
+      selectedElements,
     } = d;
-    if (!transform) {
-      transform = selectedElement.transform.clone();
+    if (!transformList.length) {
+      transformList = [...selectedElements].map((v) => {
+        let transformSnapShort = v.transform.clone();
+        transformMap.set(transformSnapShort, v);
+        return transformSnapShort;
+      });
     }
 
     if (
       Math.abs(currentMouseX - mouseDownX!) > Number.EPSILON ||
       Math.abs(currentMouseY - mouseDownY!) > Number.EPSILON
     ) {
-      const dx = mouseDownX! - transform.e;
-      const dy = mouseDownY! - transform.f;
+      transformList.forEach((transform) => {
+        const dx = mouseDownX! - transform.e;
+        const dy = mouseDownY! - transform.f;
 
-      const targetX = currentMouseX - dx;
-      const targetY = currentMouseY - dy;
-
-      selectedElement.transform.e = targetX;
-      selectedElement.transform.f = targetY;
+        const targetX = currentMouseX - dx;
+        const targetY = currentMouseY - dy;
+        const currentElement = transformMap.get(transform);
+        if (currentElement) {
+          currentElement.transform.e = targetX;
+          currentElement.transform.f = targetY;
+        }
+      });
 
       canvasStore.render();
     }
