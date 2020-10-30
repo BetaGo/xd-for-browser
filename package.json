@@ -2,6 +2,7 @@
   "name": "xd-for-browser",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://xd.no1.me",
   "dependencies": {
     "@adobe/react-spectrum": "^3.4.0",
     "@emotion/core": "^10.0.35",
