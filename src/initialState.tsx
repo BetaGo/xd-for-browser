@@ -1,6 +1,6 @@
 import { Rectangle } from "./draw/shape";
 import { FillStyle, LinearGradient, StrokeStyle } from "./draw/style";
-import { degree2Radian } from "./draw/utils";
+import { degree2Radian } from "./utils/math";
 import { CanvasStore } from "./stores/canvas";
 
 export const setUpDevelopmentInitialCanvasStore = (

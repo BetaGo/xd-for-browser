@@ -1,14 +1,23 @@
 import EventEmitter from "eventemitter3";
 import ResizeObserver from "resize-observer-polyfill";
 
-import { MouseEventButton } from "../constants";
 import { createIdentityMatrix, Matrix } from "../xd/scenegraph/matrix";
 import { Element } from "./element";
 import { IGRenderElement } from "./elements/interface";
 import { RootNode } from "./elements/rootNode";
 import { RenderMouseEvent } from "./event";
 import { IGRenderEventMap } from "./events";
-import { IPoint, setupCanvas } from "./utils";
+import { Point } from "../utils/geometry";
+
+export function setupCanvas(canvas: HTMLCanvasElement) {
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  const ctx = canvas.getContext("2d");
+  ctx?.scale(dpr, dpr);
+  return ctx;
+}
 
 export class GRender {
   static init(container: HTMLElement) {
@@ -25,6 +34,8 @@ export class GRender {
   transform: Matrix;
   zoomValue = 1;
 
+  private hoveredPath: Array<IGRenderElement> = [];
+
   private canvasResizeObserver = new ResizeObserver((entries) => {
     for (const entry of entries) {
       if (entry.target === this.canvasElement) {
@@ -38,9 +49,6 @@ export class GRender {
   });
 
   readonly dpr: number;
-
-  private MouseDownButton: MouseEventButton | null = null;
-  private MouseDownPoint: IPoint | null = null;
 
   constructor(container: HTMLElement) {
     this.containerElement = container;
@@ -76,7 +84,7 @@ export class GRender {
     this.transform.translate(x, y);
   }
 
-  scale(value: number, center?: IPoint) {
+  scale(value: number, center?: Point) {
     if (center) {
       this.transform.scale(value, value, center.x, center.y);
     } else {
@@ -84,7 +92,7 @@ export class GRender {
     }
   }
 
-  zoom(value: number, center?: IPoint) {
+  zoom(value: number, center?: Point) {
     const v = Math.min(
       Math.max(value, GRender.MIN_ZOOM_VALUE),
       GRender.MAX_ZOOM_VALUE
@@ -148,7 +156,7 @@ export class GRender {
     this.eventEmitter.off(type, listener);
   }
 
-  getElementFromPoint(point: IPoint): Element | undefined {
+  getElementFromPoint(point: Point): Element | undefined {
     // TODO:
     return;
   }
@@ -173,7 +181,7 @@ export class GRender {
     > = ["click", "mousedown", "mouseup", "mousemove"];
     mouseEventList.forEach((eventType) => {
       this.canvasElement.addEventListener(eventType, (e) => {
-        let point: IPoint = this.getCanvasPointFromEvent(e);
+        let point: Point = this.getCanvasPointFromEvent(e);
         const path: IGRenderElement[] = [];
         let captureQueue: IGRenderElement[] = [this.rootNode];
 
@@ -187,6 +195,69 @@ export class GRender {
 
         path.reverse();
 
+        if (eventType === "mousemove") {
+          // mouseleave
+          const mouseleaveEvt = new RenderMouseEvent("mouseleave");
+          mouseleaveEvt.target = this.hoveredPath[0];
+          mouseleaveEvt.path = this.hoveredPath;
+          mouseleaveEvt.button = e.button;
+          mouseleaveEvt.altKey = e.altKey;
+          mouseleaveEvt.ctrlKey = e.ctrlKey;
+          mouseleaveEvt.metaKey = e.metaKey;
+          mouseleaveEvt.shiftKey = e.shiftKey;
+
+          // capture
+          for (let i = this.hoveredPath.length - 1; i >= 0; i--) {
+            if (mouseleaveEvt.stoppedPropagation) break;
+            const current = this.hoveredPath[i];
+            if (path.includes(current)) {
+              continue;
+            } else {
+              current.dispatchEvent(mouseleaveEvt);
+            }
+          }
+          // bubble
+          for (let i = 0; i < this.hoveredPath.length; i++) {
+            if (mouseleaveEvt.stoppedPropagation) break;
+            const current = this.hoveredPath[i];
+            if (path.includes(current)) {
+              continue;
+            } else {
+              current.dispatchEvent(mouseleaveEvt);
+            }
+          }
+
+          // mouseenter
+          const mouseenterEvt = new RenderMouseEvent("mouseenterEvt");
+          mouseenterEvt.target = path[0];
+          mouseenterEvt.path = path;
+          mouseenterEvt.button = e.button;
+          mouseenterEvt.altKey = e.altKey;
+          mouseenterEvt.ctrlKey = e.ctrlKey;
+          mouseenterEvt.metaKey = e.metaKey;
+          mouseenterEvt.shiftKey = e.shiftKey;
+          // capture
+          for (let i = path.length - 1; i >= 0; i--) {
+            if (mouseenterEvt.stoppedPropagation) break;
+            const current = path[i];
+            if (this.hoveredPath.includes(current)) {
+              continue;
+            } else {
+              current.dispatchEvent(mouseenterEvt);
+            }
+          }
+          // bubble
+          for (let i = 0; i < path.length; i++) {
+            if (mouseenterEvt.stoppedPropagation) break;
+            const current = path[i];
+            if (this.hoveredPath.includes(current)) {
+              continue;
+            } else {
+              current.dispatchEvent(mouseenterEvt);
+            }
+          }
+        }
+
         let evt = new RenderMouseEvent(eventType);
         evt.target = path[0];
         evt.path = path;
@@ -197,17 +268,14 @@ export class GRender {
         evt.shiftKey = e.shiftKey;
         // capture
         for (let i = path.length - 1; i >= 0; i--) {
-          if (evt.stoppedPropagation) return;
+          if (evt.stoppedPropagation) break;
           const current = path[i];
-          evt.currentTarget = current;
           current.dispatchEvent(evt, "capture");
         }
-
         // bubble
         for (let i = 0; i < path.length; i++) {
-          if (evt.stoppedPropagation) return;
+          if (evt.stoppedPropagation) break;
           const current = path[i];
-          evt.currentTarget = current;
           current.dispatchEvent(evt, "bubble");
         }
       });

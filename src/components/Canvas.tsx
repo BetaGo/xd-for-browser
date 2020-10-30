@@ -5,7 +5,7 @@ import { ContextMenuTrigger } from "react-contextmenu";
 import { useHistory } from "react-router-dom";
 
 import { Artboard } from "../draw/elements/artboard";
-import { IPoint } from "../draw/utils";
+import { Point } from "../utils/geometry";
 import { useStores } from "../hooks/useStores";
 import styled from "../styles/styled";
 import ArtboardTitle from "./canvas-controls/ArtboardTitle";
@@ -114,9 +114,9 @@ const Canvas = () => {
     const handleWheelEvent = (e: WheelEvent) => {
       e.preventDefault();
       if (e.altKey || e.ctrlKey) {
-        const nextScale = canvasStore.zoomValue - (e.deltaY / 100) * 0.2;
+        const nextScale = canvasStore.zoomValue * (1 - (e.deltaY / 100) * 0.2);
         const point = getCanvasPointFromEvent(e);
-        const mousePoint: IPoint = {
+        const mousePoint: Point = {
           x: point.domX,
           y: point.domY,
         };

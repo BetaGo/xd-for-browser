@@ -3,7 +3,7 @@ import { makeAutoObservable, makeObservable, observable } from "mobx";
 import { Artboard } from "../draw/elements/artboard";
 import { RootNode } from "../draw/elements/rootNode";
 import { GRender } from "../draw/gRender";
-import { IPoint } from "../draw/utils";
+import { Point } from "../utils/geometry";
 import { Matrix } from "../xd/scenegraph/matrix";
 import { SceneNode } from "../xd/scenegraph/sceneNode";
 
@@ -24,6 +24,8 @@ export class CanvasStore {
 
   transform?: Matrix;
 
+  private afterInitRenderQueue: Function[] = [];
+
   get zoomValue() {
     return this.gRender?.zoomValue ?? 1;
   }
@@ -42,7 +44,7 @@ export class CanvasStore {
     makeAutoObservable(this);
   }
 
-  zoom(value: number, center?: IPoint) {
+  zoom(value: number, center?: Point) {
     this.gRender?.zoom(value, center);
     this.render();
   }
@@ -58,6 +60,12 @@ export class CanvasStore {
     });
 
     this.render();
+
+    this.afterInitRenderQueue.forEach((v) => v());
+  }
+
+  runAfterInitRender(cb: Function) {
+    this.afterInitRenderQueue.push(cb);
   }
 
   render() {

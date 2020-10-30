@@ -1,22 +1,21 @@
-import * as math from "mathjs";
-
-export interface IPoint {
+export type Point = {
   x: number;
   y: number;
-}
+};
 
 export type Vec2 = [number, number];
 export type Vec3 = [number, number, number];
+export type Rect = { x: number; y: number; width: number; height: number };
+export type RectPath = [Point, Point, Point, Point];
 
-export function setupCanvas(canvas: HTMLCanvasElement) {
-  const dpr = window.devicePixelRatio || 1;
-  const rect = canvas.getBoundingClientRect();
-  canvas.width = rect.width * dpr;
-  canvas.height = rect.height * dpr;
-  const ctx = canvas.getContext("2d");
-  ctx?.scale(dpr, dpr);
-  return ctx;
-}
+export const isRectOverlap = (rect1: RectPath, rect2: RectPath) => {
+  // FIXME: use OBB
+  // @see https://blog.csdn.net/tom_221x/article/details/38457757
+  return (
+    rect1.some((point) => pointInRegionCN(point, rect2)) ||
+    rect2.some((point) => pointInRegionCN(point, rect1))
+  );
+};
 
 /**
  * The Crossing Number (cn) method
@@ -26,7 +25,7 @@ export function setupCanvas(canvas: HTMLCanvasElement) {
  * @param point
  * @param region
  */
-export function pointInRegionCN(point: IPoint, region: IPoint[]): boolean {
+export function pointInRegionCN(point: Point, region: Point[]): boolean {
   let cn = 0;
   region.reduce((p1, p2) => {
     if (p1.y === p2.y) return p2;
@@ -48,7 +47,7 @@ export function pointInRegionCN(point: IPoint, region: IPoint[]): boolean {
  * @param point
  * @param region
  */
-export function pointInRegionWN(point: IPoint, region: IPoint[]): boolean {
+export function pointInRegionWN(point: Point, region: Point[]): boolean {
   let wn = 0;
   region.reduce((p1, p2) => {
     if (p1.y === p2.y) return p2;
@@ -65,35 +64,3 @@ export function pointInRegionWN(point: IPoint, region: IPoint[]): boolean {
 
   return wn !== 0;
 }
-
-export const createRotateMatrix = (angle: number) => {
-  return math.matrix([
-    [math.cos(angle), -math.sin(angle), 0],
-    [math.sin(angle), math.cos(angle), 0],
-    [0, 0, 1],
-  ]);
-};
-
-export const createTranslateMatrix = (x: number, y: number) => {
-  return math.matrix([
-    [1, 0, x],
-    [0, 1, y],
-    [0, 0, 1],
-  ]);
-};
-
-/**
- * multi Matrix product
- * @param values Matrix
- */
-export const multiMatrixMultiply = (...values: math.Matrix[]): math.Matrix => {
-  return values.reduce((a, b) => math.multiply(a, b));
-};
-
-export const degree2Radian = (degree: number): number => {
-  return (degree / 180) * Math.PI;
-};
-
-export const radian2Degree = (radian: number): number => {
-  return (radian / Math.PI) * 180;
-};

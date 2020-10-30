@@ -6,7 +6,7 @@ import { RadialGradient } from "../../xd/scenegraph/radialGradient";
 import { SceneNode } from "../../xd/scenegraph/sceneNode";
 import { MixinRenderEventTarget } from "../event";
 import { GRender } from "../gRender";
-import { IPoint, pointInRegionWN } from "../utils";
+import { Point, pointInRegionWN } from "../../utils/geometry";
 import { IGRenderElement } from "./interface";
 
 export class Artboard
@@ -45,8 +45,8 @@ export class Artboard
     ctx.restore();
   }
 
-  isInnerPoint(point: IPoint): boolean {
-    const region: IPoint[] = [
+  isInnerPoint(point: Point): boolean {
+    const region: Point[] = [
       { x: this.transform.e, y: this.transform.f },
       { x: this.transform.e + this.width, y: this.transform.f },
       { x: this.transform.e + this.width, y: this.transform.f + this.height },

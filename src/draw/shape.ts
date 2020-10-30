@@ -3,14 +3,12 @@ import { inv, multiply } from "mathjs";
 
 import { Element } from "./element";
 import { Transform } from "./transform";
+import { Point, pointInRegionWN, Vec3 } from "../utils/geometry";
 import {
   createRotateMatrix,
   createTranslateMatrix,
-  IPoint,
   multiMatrixMultiply,
-  pointInRegionWN,
-  Vec3,
-} from "./utils";
+} from "../utils/math";
 
 export interface IBoundingRect {
   x: number;
@@ -117,7 +115,7 @@ export class Rectangle extends Element {
 
   update() {}
 
-  updatePosition(point: IPoint) {
+  updatePosition(point: Point) {
     if (this.x !== point.x || this.y !== point.y) {
       this.x = point.x;
       this.y = point.y;
@@ -125,15 +123,15 @@ export class Rectangle extends Element {
     }
   }
 
-  isInnerPoint(point: IPoint): boolean {
+  isInnerPoint(point: Point): boolean {
     const v: Vec3 = [point.x, point.y, 1];
     const invTransform = inv(this.transform.toMatrix());
     const res = multiply(invTransform, v);
-    const p: IPoint = {
+    const p: Point = {
       x: res.get([0]),
       y: res.get([1]),
     };
-    const pointList: IPoint[] = [
+    const pointList: Point[] = [
       { x: this.x, y: this.y },
       { x: this.x + this.width, y: this.y },
       { x: this.x + this.width, y: this.y + this.height },
@@ -212,7 +210,7 @@ export class Rectangle extends Element {
     }
   }
 
-  rotate(angle: number, center?: IPoint) {
+  rotate(angle: number, center?: Point) {
     if (!center) {
       const centerPointVec: Vec3 = [
         this.x + this.width / 2,

@@ -125,7 +125,7 @@ const ResizeAndRotate = () => {
       };
       rectList.push(d);
     });
-    console.log(rectList);
+    // console.log(rectList);
     const res = rectList.reduce((a, b) => {
       let x = Math.min(a.x, b.x);
       let y = Math.min(a.y, b.y);
@@ -161,8 +161,12 @@ const ResizeAndRotate = () => {
     // });
   };
 
+  if (!canvasStore.selectedElements.size) {
+    return null;
+  }
+  const styles = getStyles();
   return (
-    <Root style={getStyles()}>
+    <Root style={styles}>
       <ControlPoint
         resizeEdge="nw"
         draggable

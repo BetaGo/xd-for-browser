@@ -5,7 +5,7 @@ import { GRender } from "./gRender";
 import { BoundingBox, IBoundingRect } from "./shape";
 import { Style } from "./style";
 import { Transform } from "./transform";
-import { IPoint } from "./utils";
+import { Point } from "../utils/geometry";
 
 export abstract class Element {
   visible: boolean = true;
@@ -58,21 +58,21 @@ export abstract class Element {
   abstract type: string;
 
   abstract render(): void;
-  abstract isInnerPoint(point: IPoint): boolean;
+  abstract isInnerPoint(point: Point): boolean;
   abstract toJSON(): any;
   abstract getBoundingBox(): BoundingBox;
   abstract setBounding<K extends keyof IBoundingRect>(
     key: K,
     value: IBoundingRect[K]
   ): void;
-  abstract updatePosition(point: IPoint): void;
+  abstract updatePosition(point: Point): void;
 
   /**
    *  rotate element
    * @param angle  (measured in radians)
    * @param center rotate center point; use element Bounding center by default.
    */
-  abstract rotate(angle: number, center?: IPoint): void;
+  abstract rotate(angle: number, center?: Point): void;
 
   /**
    * set element current rotate

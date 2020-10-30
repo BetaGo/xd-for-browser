@@ -9,6 +9,14 @@ export class UserInterfaceStore {
   selectedDesignTool: DesignTool = DesignTool.Select;
   selectedOtherTool?: OtherTool;
 
+  selectionRect = {
+    show: false,
+    left: 0,
+    top: 0,
+    width: 0,
+    height: 0,
+  };
+
   constructor() {
     makeAutoObservable(this);
   }

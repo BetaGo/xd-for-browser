@@ -1,8 +1,8 @@
-import { IPoint, pointInRegionCN, pointInRegionWN } from "./utils";
+import { Point, pointInRegionCN, pointInRegionWN } from "./geometry";
 
 describe("draw/utils", () => {
   describe("Inclusion of a Point in Polygon", () => {
-    const square10: IPoint[] = [
+    const square10: Point[] = [
       { x: 0, y: 0 },
       { x: 10, y: 0 },
       { x: 10, y: 10 },
@@ -10,7 +10,7 @@ describe("draw/utils", () => {
       { x: 0, y: 0 },
     ];
 
-    const overlapPolygon: IPoint[] = [
+    const overlapPolygon: Point[] = [
       { x: 0, y: 0 },
       { x: 8, y: 0 },
       { x: 8, y: 8 },

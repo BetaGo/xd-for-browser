@@ -72,9 +72,11 @@ export function MixinRenderEventTarget<TBase extends Constructor>(Base: TBase) {
 
     dispatchEvent(evt: RenderEvent, mode: RenderEventMode = "all") {
       if (mode === "capture" || mode === "all") {
+        evt.currentTarget = this;
         this.#captureEE.emit(evt.type, evt);
       }
       if (mode === "bubble" || mode === "all") {
+        evt.currentTarget = this;
         this.#bubbleEE.emit(evt.type, evt);
       }
     }
@@ -98,4 +100,6 @@ export interface IRenderEventMap {
   mousedown: RenderMouseEvent;
   mouseup: RenderMouseEvent;
   mousemove: RenderMouseEvent;
+  mouseenter: RenderMouseEvent;
+  mouseleave: RenderMouseEvent;
 }

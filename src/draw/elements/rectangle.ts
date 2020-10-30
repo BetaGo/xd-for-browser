@@ -6,7 +6,7 @@ import { Rectangle as XdRectangle } from "../../xd/scenegraph/rectangle";
 import { SceneNode } from "../../xd/scenegraph/sceneNode";
 import { MixinRenderEventTarget } from "../event";
 import { GRender } from "../gRender";
-import { IPoint, pointInRegionWN } from "../utils";
+import { Point, pointInRegionWN } from "../../utils/geometry";
 import { IGRenderElement } from "./interface";
 
 export class Rectangle
@@ -50,8 +50,8 @@ export class Rectangle
     }
     ctx.restore();
   }
-  isInnerPoint(point: IPoint) {
-    const region: IPoint[] = [
+  isInnerPoint(point: Point) {
+    const region: Point[] = [
       { x: 0, y: 0 },
       { x: 0 + this.width, y: 0 },
       { x: 0 + this.width, y: 0 + this.height },

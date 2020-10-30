@@ -2,7 +2,7 @@ import { RootNode as XdRootNode } from "../../xd/scenegraph/rootNode";
 import { SceneNode } from "../../xd/scenegraph/sceneNode";
 import { MixinRenderEventTarget } from "../event";
 import { GRender } from "../gRender";
-import { IPoint } from "../utils";
+import { Point } from "../../utils/geometry";
 import { IGRenderElement } from "./interface";
 
 export class RootNode
@@ -22,7 +22,7 @@ export class RootNode
     }
   }
 
-  isInnerPoint(point: IPoint) {
+  isInnerPoint(point: Point) {
     return true;
   }
 }

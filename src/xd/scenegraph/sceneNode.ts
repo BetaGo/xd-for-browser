@@ -60,6 +60,9 @@ export abstract class SceneNode {
   readonly children: SceneNode[] = [];
   readonly transform: Matrix = createIdentityMatrix();
 
+  /**
+   * degrees
+   */
   abstract get rotation(): number;
   abstract get globalBounds(): Bounds;
   abstract get localBounds(): Bounds;
