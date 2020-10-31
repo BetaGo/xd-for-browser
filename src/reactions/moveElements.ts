@@ -6,7 +6,7 @@ import { Artboard } from "../draw/elements/artboard";
 import { isRectOverlap } from "../utils/geometry";
 import { Matrix } from "../xd/scenegraph/matrix";
 import { SceneNode } from "../xd/scenegraph/sceneNode";
-import { boundsToRectPath } from "../xd/sceneNode.helper";
+import { boundsToRectPoints } from "../xd/sceneNode.helpers";
 
 const { uiStore, canvasStore, canvasMouseStore } = globalStores;
 
@@ -45,11 +45,11 @@ export const createMoveElementsReaction = () => {
             return;
           }
           canvasStore.artboards.forEach((artboard) => {
-            const artboardRectPath = boundsToRectPath(
+            const artboardRectPath = boundsToRectPoints(
               artboard.globalBounds,
               artboard.rotation
             );
-            const currentRectPath = boundsToRectPath(
+            const currentRectPath = boundsToRectPoints(
               current.globalBounds,
               current.rotation
             );

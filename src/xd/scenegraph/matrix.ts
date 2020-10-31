@@ -1,5 +1,5 @@
 import _ from "lodash";
-import { inv, matrix, multiply } from "mathjs";
+import * as math from "mathjs";
 
 import { Bounds, Point } from "../typedefs";
 
@@ -87,13 +87,13 @@ export class Matrix {
       mF = f ?? 0;
     }
     const m1 = this.toArray();
-    const m2 = matrix([
+    const m2 = math.matrix([
       [mA, mC, mE],
       [mB, mD, mF],
       [0, 0, 1],
     ]);
 
-    const res = multiply(m2, m1);
+    const res = math.multiply(m2, m1);
     this.a = res.get([0, 0]);
     this.b = res.get([1, 0]);
     this.c = res.get([0, 1]);
@@ -104,7 +104,7 @@ export class Matrix {
   }
 
   invert(): Matrix {
-    const invMatrix = inv(matrix(this.toArray()));
+    const invMatrix = math.inv(math.matrix(this.toArray()));
     return new Matrix(
       invMatrix.get([0, 0]),
       invMatrix.get([1, 0]),
@@ -170,7 +170,7 @@ export class Matrix {
 
   transformPoint(point: Point): Point {
     const vec = [point.x, point.y, 1];
-    const res = multiply(matrix(this.toArray()), vec);
+    const res = math.multiply(math.matrix(this.toArray()), vec);
     return {
       x: res.get([0]),
       y: res.get([1]),

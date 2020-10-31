@@ -1,4 +1,4 @@
-import { Matrix, matrix, multiply } from "mathjs";
+import * as math from "mathjs";
 
 export class Transform {
   /**
@@ -27,18 +27,18 @@ export class Transform {
   ty: number = 0;
 
   toMatrix() {
-    return matrix([
+    return math.matrix([
       [this.a, this.c, this.tx],
       [this.b, this.d, this.ty],
       [0, 0, 1],
     ]);
   }
 
-  multiply(t: Matrix, direction: "left" | "right" = "right") {
+  multiply(t: math.Matrix, direction: "left" | "right" = "right") {
     const res =
       direction === "left"
-        ? multiply(t, this.toMatrix())
-        : multiply(this.toMatrix(), t);
+        ? math.multiply(t, this.toMatrix())
+        : math.multiply(this.toMatrix(), t);
     this.a = res.get([0, 0]);
     this.b = res.get([1, 0]);
     this.c = res.get([0, 1]);

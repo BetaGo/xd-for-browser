@@ -1,5 +1,5 @@
 import _ from "lodash";
-import { inv, multiply } from "mathjs";
+import * as math from "mathjs";
 
 import { Element } from "./element";
 import { Transform } from "./transform";
@@ -33,10 +33,10 @@ export class BoundingBox {
     const d: Vec3 = [this.x, this.y + this.height, 1];
 
     const transformMatrix = this.transform.toMatrix();
-    const ta = multiply(transformMatrix, a).toArray() as Vec3;
-    const tb = multiply(transformMatrix, b).toArray() as Vec3;
-    const tc = multiply(transformMatrix, c).toArray() as Vec3;
-    const td = multiply(transformMatrix, d).toArray() as Vec3;
+    const ta = math.multiply(transformMatrix, a).toArray() as Vec3;
+    const tb = math.multiply(transformMatrix, b).toArray() as Vec3;
+    const tc = math.multiply(transformMatrix, c).toArray() as Vec3;
+    const td = math.multiply(transformMatrix, d).toArray() as Vec3;
 
     const x = Math.min(ta[0], tb[0], tc[0], td[0]);
     const y = Math.min(ta[1], tb[1], tc[1], td[1]);
@@ -125,8 +125,8 @@ export class Rectangle extends Element {
 
   isInnerPoint(point: Point): boolean {
     const v: Vec3 = [point.x, point.y, 1];
-    const invTransform = inv(this.transform.toMatrix());
-    const res = multiply(invTransform, v);
+    const invTransform = math.inv(this.transform.toMatrix());
+    const res = math.multiply(invTransform, v);
     const p: Point = {
       x: res.get([0]),
       y: res.get([1]),
@@ -217,10 +217,9 @@ export class Rectangle extends Element {
         this.y + this.height / 2,
         1,
       ];
-      const [x, y] = multiply(
-        this.transform.toMatrix(),
-        centerPointVec
-      ).toArray() as number[];
+      const [x, y] = math
+        .multiply(this.transform.toMatrix(), centerPointVec)
+        .toArray() as number[];
       center = {
         x,
         y,

@@ -1,3 +1,5 @@
+import { Polygon } from "./polygon";
+
 export type Point = {
   x: number;
   y: number;
@@ -6,15 +8,12 @@ export type Point = {
 export type Vec2 = [number, number];
 export type Vec3 = [number, number, number];
 export type Rect = { x: number; y: number; width: number; height: number };
-export type RectPath = [Point, Point, Point, Point];
+export type RectPoints = [Point, Point, Point, Point];
 
-export const isRectOverlap = (rect1: RectPath, rect2: RectPath) => {
-  // FIXME: use OBB
-  // @see https://blog.csdn.net/tom_221x/article/details/38457757
-  return (
-    rect1.some((point) => pointInRegionCN(point, rect2)) ||
-    rect2.some((point) => pointInRegionCN(point, rect1))
-  );
+export const isRectOverlap = (rect1: RectPoints, rect2: RectPoints) => {
+  const p1 = new Polygon(rect1);
+  const p2 = new Polygon(rect2);
+  return p1.collidesWidth(p2);
 };
 
 /**

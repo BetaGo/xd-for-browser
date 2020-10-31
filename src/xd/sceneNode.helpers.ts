@@ -1,10 +1,10 @@
-import { multiply } from "mathjs";
+import * as math from "mathjs";
 
-import { RectPath, Vec3 } from "../utils/geometry";
+import { RectPoints, Vec3 } from "../utils/geometry";
 import { createRotateMatrix, degree2Radian } from "../utils/math";
 import { Bounds } from "./typedefs";
 
-export const boundsToRectPath = (bounds: Bounds, rotation: number) => {
+export const boundsToRectPoints = (bounds: Bounds, rotation: number) => {
   const rect = bounds;
   const rotateMatrix = createRotateMatrix(degree2Radian(rotation));
   const rectPath = [
@@ -14,11 +14,11 @@ export const boundsToRectPath = (bounds: Bounds, rotation: number) => {
     { x: rect.x, y: rect.y + rect.height },
   ].map((v) => {
     const vector: Vec3 = [v.x, v.y, 1];
-    const res = multiply(rotateMatrix, vector);
+    const res = math.multiply(rotateMatrix, vector);
     return {
       x: res.get([0]),
       y: res.get([1]),
     };
-  }) as RectPath;
+  }) as RectPoints;
   return rectPath;
 };

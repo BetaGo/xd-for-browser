@@ -1,5 +1,5 @@
 import Color from "color";
-import { multiply } from "mathjs";
+import * as math from "mathjs";
 
 import { Element } from "./element";
 import { Transform } from "./transform";
@@ -120,16 +120,12 @@ export class LinearGradient extends Gradient {
     let { x1, y1, x2, y2 } = this;
 
     if (transform) {
-      [x1, y1] = multiply(transform.toMatrix(), [
-        x1,
-        y1,
-        1,
-      ]).toArray() as number[];
-      [x2, y2] = multiply(transform.toMatrix(), [
-        x2,
-        y2,
-        1,
-      ]).toArray() as number[];
+      [x1, y1] = math
+        .multiply(transform.toMatrix(), [x1, y1, 1])
+        .toArray() as number[];
+      [x2, y2] = math
+        .multiply(transform.toMatrix(), [x2, y2, 1])
+        .toArray() as number[];
     }
     const lg = ctx.createLinearGradient(x1, y1, x2, y2);
     this.stops.forEach((s) => {

@@ -4,7 +4,7 @@ import {
 } from "@adobe/react-spectrum";
 import { ThemeProvider } from "emotion-theming";
 import React from "react";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { HashRouter as Router, Route, Switch } from "react-router-dom";
 
 import HomePage from "./pages/Home";
 import StartPage from "./pages/Start";

@@ -6,9 +6,9 @@ import { Artboard } from "../draw/elements/artboard";
 import { IGRenderElement } from "../draw/elements/interface";
 import { RootNode } from "../draw/elements/rootNode";
 import { IRenderEventTarget, RenderMouseEvent } from "../draw/event";
-import { isRectOverlap, RectPath } from "../utils/geometry";
+import { isRectOverlap, RectPoints } from "../utils/geometry";
 import { SceneNode } from "../xd/scenegraph/sceneNode";
-import { boundsToRectPath } from "../xd/sceneNode.helper";
+import { boundsToRectPoints } from "../xd/sceneNode.helpers";
 
 const { uiStore, canvasStore, canvasMouseStore } = globalStores;
 
@@ -97,7 +97,7 @@ export const createSelectElementsReaction = () => {
         const selectedElements: Set<SceneNode> = new Set();
         let list = [...canvasStore.gRender!.rootNode.children];
         const { mouseDownX, mouseDownY, currentMouseX, currentMouseY } = d;
-        const selectionRectPath: RectPath = [
+        const selectionRectPath: RectPoints = [
           {
             x: mouseDownX!,
             y: mouseDownY!,
@@ -121,7 +121,7 @@ export const createSelectElementsReaction = () => {
           if (current instanceof Artboard) {
             list.push(...current.children);
           } else {
-            const rectPath = boundsToRectPath(
+            const rectPath = boundsToRectPoints(
               current.globalBounds,
               current.rotation
             );

@@ -1,4 +1,7 @@
 export async function openFile(accept?: string): Promise<File | undefined> {
+  if ("showOpenFilePicker" in window) {
+    // TODO:
+  }
   const elementId = "__file_utils__open_file";
   return new Promise((resolve) => {
     let fileInput: HTMLInputElement | null = document.querySelector(
