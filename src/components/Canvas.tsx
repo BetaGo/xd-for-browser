@@ -123,7 +123,8 @@ const Canvas = () => {
         canvasStore.zoom(nextScale, mousePoint);
       } else {
         const scrollY = -e.deltaY;
-        canvasStore.gRender?.translate(0, scrollY);
+        const scrollX = -e.deltaX;
+        canvasStore.gRender?.translate(scrollX, scrollY);
         canvasStore.render();
       }
     };
