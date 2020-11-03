@@ -1,5 +1,6 @@
 import _ from "lodash";
 import * as math from "mathjs";
+import { makeAutoObservable } from "mobx";
 
 import { Bounds, Point } from "../typedefs";
 
@@ -11,7 +12,9 @@ export class Matrix {
     public d: number,
     public e: number,
     public f: number
-  ) {}
+  ) {
+    makeAutoObservable(this);
+  }
 
   setForm(otherMatrix: Matrix) {
     this.a = otherMatrix.a;

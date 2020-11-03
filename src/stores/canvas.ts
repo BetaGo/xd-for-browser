@@ -5,7 +5,7 @@ import { RootNode } from "../draw/elements/rootNode";
 import { GRender } from "../draw/gRender";
 import { Point } from "../utils/geometry";
 import { Matrix } from "../xd/scenegraph/matrix";
-import { SceneNode } from "../xd/scenegraph/sceneNode";
+import { Selection } from "../xd/scenegraph/selection";
 
 class GRenderObservable extends GRender {
   constructor(container: HTMLElement) {
@@ -20,8 +20,8 @@ class GRenderObservable extends GRender {
 
 export class CanvasStore {
   gRender: GRender | null = null;
-  selectedElements: Set<SceneNode> = new Set();
-
+  // selectedElements: Set<SceneNode> = new Set();
+  selection = new Selection();
   transform?: Matrix;
 
   private afterInitRenderQueue: Function[] = [];

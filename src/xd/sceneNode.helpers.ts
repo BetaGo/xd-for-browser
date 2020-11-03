@@ -2,6 +2,10 @@ import * as math from "mathjs";
 
 import { RectPoints, Vec3 } from "../utils/geometry";
 import { createRotateMatrix, degree2Radian } from "../utils/math";
+import { Artboard } from "./scenegraph/artboard";
+import { Rectangle } from "./scenegraph/rectangle";
+import { RootNode } from "./scenegraph/rootNode";
+import { SceneNode } from "./scenegraph/sceneNode";
 import { Bounds } from "./typedefs";
 
 export const boundsToRectPoints = (bounds: Bounds, rotation: number) => {
@@ -21,4 +25,18 @@ export const boundsToRectPoints = (bounds: Bounds, rotation: number) => {
     };
   }) as RectPoints;
   return rectPath;
+};
+
+export const typeofNode = (node: SceneNode) => {
+  if (node instanceof Rectangle) {
+    return "rectangle";
+  }
+  if (node instanceof Artboard) {
+    return "artboard";
+  }
+  if (node instanceof RootNode) {
+    return "rootNode";
+  }
+  // TODO: continue
+  return null;
 };

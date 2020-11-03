@@ -73,17 +73,17 @@ export const createDrawRectReaction = () => {
         creatingRect.transform.e = x;
         creatingRect.transform.f = y;
 
-        canvasStore.selectedElements.clear();
-        canvasStore.selectedElements.add(creatingRect);
-
         const startPoint: Point = { x: mouseDownX!, y: mouseDownY! };
+        canvasStore.gRender?.rootNode?.addChild(creatingRect);
         for (let artboard of canvasStore.artboards) {
           if (artboard.isInnerPoint(startPoint)) {
+            creatingRect.removeFromParent();
             artboard.addChild(creatingRect);
-            return;
+            break;
           }
         }
-        canvasStore.gRender?.rootNode?.addChild(creatingRect);
+
+        canvasStore.selection.items = [creatingRect];
       } else {
         creatingRect.transform.e = x;
         creatingRect.transform.f = y;

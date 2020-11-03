@@ -1,3 +1,4 @@
+import { makeAutoObservable } from "mobx";
 import { Color } from "./color";
 
 export class Shadow {
@@ -7,5 +8,7 @@ export class Shadow {
     public blur: number,
     public color: Color,
     public visible: boolean = true
-  ) {}
+  ) {
+    makeAutoObservable(this);
+  }
 }

@@ -1,4 +1,5 @@
 import _ from "lodash";
+import { makeAutoObservable } from "mobx";
 import { Color } from "./color";
 export class LinearGradient {
   colorStops: Array<{
@@ -10,6 +11,11 @@ export class LinearGradient {
   startY?: number;
   endX?: number;
   endY?: number;
+
+  constructor() {
+    makeAutoObservable(this);
+  }
+
   clone() {
     return _.cloneDeep(this);
   }

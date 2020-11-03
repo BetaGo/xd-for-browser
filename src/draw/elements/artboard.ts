@@ -1,3 +1,6 @@
+import { computed, makeObservable, observable } from "mobx";
+
+import { Point, pointInRegionWN } from "../../utils/geometry";
 import { Artboard as XdArtboard } from "../../xd/scenegraph/artboard";
 import { Color } from "../../xd/scenegraph/color";
 import { ImageFill } from "../../xd/scenegraph/imageFill";
@@ -6,7 +9,6 @@ import { RadialGradient } from "../../xd/scenegraph/radialGradient";
 import { SceneNode } from "../../xd/scenegraph/sceneNode";
 import { MixinRenderEventTarget } from "../event";
 import { GRender } from "../gRender";
-import { Point, pointInRegionWN } from "../../utils/geometry";
 import { IGRenderElement } from "./interface";
 
 export class Artboard
@@ -14,6 +16,18 @@ export class Artboard
   implements IGRenderElement {
   parent: (SceneNode & IGRenderElement) | null = null;
   children: Array<SceneNode & IGRenderElement> = [];
+
+  constructor() {
+    super();
+    makeObservable(this, {
+      children: observable,
+      parent: observable,
+      transform: observable,
+      width: observable,
+      height: observable,
+      translation: computed,
+    });
+  }
 
   render(gRender: GRender) {
     const ctx = gRender.canvasCtx2D;

@@ -1,5 +1,6 @@
 import ColorJs from "color";
 import _ from "lodash";
+import { makeAutoObservable } from "mobx";
 
 export type ColorParam =
   | Color
@@ -9,52 +10,34 @@ export type ColorParam =
   | { [key: string]: any };
 
 export class Color {
-  get a(): number {
-    return Math.floor(this._color.a() * 255);
-  }
-  set a(value: number) {
-    this._color.alpha(value / 255);
-  }
-  get r(): number {
-    return this._color.red();
-  }
-  set r(value: number) {
-    this._color.red(value);
-  }
-  get g(): number {
-    return this._color.green();
-  }
-  set g(value: number) {
-    this._color.green(value);
-  }
-  get b(): number {
-    return this._color.blue();
-  }
-  set b(value: number) {
-    this._color.blue(value);
-  }
-
-  private _color: ColorJs;
+  a: number;
+  r: number;
+  g: number;
+  b: number;
 
   constructor(value: ColorParam, opacity?: number) {
-    this._color = ColorJs(value);
+    makeAutoObservable(this);
+    const color = ColorJs(value);
     if (opacity) {
-      this._color.alpha(opacity);
+      color.alpha(opacity);
     }
+    this.a = color.alpha() * 255;
+    this.r = color.red();
+    this.g = color.green();
+    this.b = color.blue();
   }
 
   toRgba() {
-    const obj = this._color.object();
     return {
-      a: Math.floor((obj.alpha ?? 1) * 255),
-      r: obj.r,
-      g: obj.j,
-      b: obj.b,
+      a: this.a,
+      r: this.r,
+      g: this.g,
+      b: this.b,
     };
   }
 
   toHex(forceSixDigits: boolean = false) {
-    let arr = this._color.rgb().array();
+    let arr = [this.r, this.g, this.b];
     let hexArr = arr.slice(0, 3).map((v) => v.toString(16));
     let s = hexArr.join("");
     if ((s.length === 3 || s.length === 6) && !forceSixDigits) {
@@ -73,7 +56,9 @@ export class Color {
   }
 
   string() {
-    return this._color.string();
+    const s = `rgba(${this.r},${this.g},${this.b},${this.a / 255})`;
+    const color = ColorJs(s);
+    return color.string();
   }
 
   clone() {

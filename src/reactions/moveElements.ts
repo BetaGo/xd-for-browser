@@ -17,7 +17,7 @@ export const createMoveElementsReaction = () => {
     () => {
       return {
         selectedDesignTool: uiStore.selectedDesignTool,
-        selectedElements: canvasStore.selectedElements,
+        selectedElements: canvasStore.selection.items,
         mouseDownX: canvasMouseStore.mouseDownX,
         mouseDownY: canvasMouseStore.mouseDownY,
         currentMouseX: canvasMouseStore.currentMouseX,
@@ -28,7 +28,7 @@ export const createMoveElementsReaction = () => {
     (d) => {
       if (
         d.selectedDesignTool !== DesignTool.Select ||
-        !d.selectedElements.size ||
+        !d.selectedElements.length ||
         !d.isMainButtonDown ||
         uiStore.selectionRect.show
       ) {

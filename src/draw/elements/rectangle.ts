@@ -1,3 +1,6 @@
+import { computed, makeObservable, observable } from "mobx";
+
+import { Point, pointInRegionWN } from "../../utils/geometry";
 import { Color } from "../../xd/scenegraph/color";
 import { ImageFill } from "../../xd/scenegraph/imageFill";
 import { LinearGradient } from "../../xd/scenegraph/linearGradient";
@@ -6,7 +9,6 @@ import { Rectangle as XdRectangle } from "../../xd/scenegraph/rectangle";
 import { SceneNode } from "../../xd/scenegraph/sceneNode";
 import { MixinRenderEventTarget } from "../event";
 import { GRender } from "../gRender";
-import { Point, pointInRegionWN } from "../../utils/geometry";
 import { IGRenderElement } from "./interface";
 
 export class Rectangle
@@ -16,6 +18,20 @@ export class Rectangle
   children: Array<SceneNode & IGRenderElement> = [];
 
   strokeEnabled = true;
+
+  constructor() {
+    super();
+    makeObservable(this, {
+      children: observable,
+      parent: observable,
+      transform: observable,
+      translation: computed,
+      width: observable,
+      height: observable,
+      rotation: computed,
+    });
+  }
+
   render(gRender: GRender) {
     const ctx = gRender.canvasCtx2D;
     ctx.save();

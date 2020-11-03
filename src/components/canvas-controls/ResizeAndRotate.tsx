@@ -114,9 +114,9 @@ const ResizeAndRotate = () => {
   const { e, f } = canvasStore.transform || {};
 
   const getStyles = (): React.CSSProperties => {
-    if (!canvasStore.selectedElements.size) return {};
+    if (!canvasStore.selection.items.length) return {};
     let rectList: IBoundingRect[] = [];
-    canvasStore.selectedElements.forEach((v) => {
+    canvasStore.selection.items.forEach((v) => {
       let d = {
         x: v.globalBounds.x,
         y: v.globalBounds.y,
@@ -161,7 +161,7 @@ const ResizeAndRotate = () => {
     // });
   };
 
-  if (!canvasStore.selectedElements.size) {
+  if (!canvasStore.selection.items.length) {
     return null;
   }
   const styles = getStyles();

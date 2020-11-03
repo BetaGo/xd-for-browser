@@ -54,8 +54,8 @@ export class Rectangle extends GraphicNode {
   get localBounds(): Bounds {
     // TODO:
     return {
-      x: 0,
-      y: 0,
+      x: this.transform.e,
+      y: this.transform.f,
       width: this.width,
       height: this.height,
     };

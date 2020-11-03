@@ -24,32 +24,33 @@ export const createSelectElementsReaction = () => {
     }
     mousedownElement = e.target;
     runInAction(() => {
+      const selectedElements = new Set(canvasStore.selection.items);
       if (e.target instanceof Artboard || e.target instanceof RootNode) {
         // TODO:
-        canvasStore.selectedElements.forEach((e) => {
+        selectedElements.forEach((e) => {
           e.selected = false;
         });
-        canvasStore.selectedElements.clear();
-        return;
+        selectedElements.clear();
       } else {
         if (!e.target) return;
         const target = e.target as SceneNode & IGRenderElement;
         if (e.shiftKey) {
-          if (canvasStore.selectedElements.has(target)) {
+          if (selectedElements.has(target)) {
             target.selected = false;
-            canvasStore.selectedElements.delete(target);
+            selectedElements.delete(target);
           } else {
             target.selected = true;
-            canvasStore.selectedElements.add(target);
+            selectedElements.add(target);
           }
         } else {
-          if (!canvasStore.selectedElements.has(target)) {
-            canvasStore.selectedElements.clear();
+          if (!selectedElements.has(target)) {
+            selectedElements.clear();
             target.selected = true;
-            canvasStore.selectedElements.add(target);
+            selectedElements.add(target);
           }
         }
       }
+      canvasStore.selection.items = [...selectedElements];
     });
   };
 
@@ -130,7 +131,7 @@ export const createSelectElementsReaction = () => {
             }
           }
         }
-        canvasStore.selectedElements = selectedElements;
+        canvasStore.selection.itemsIncludingLocked = [...selectedElements];
       }
     }
   );
