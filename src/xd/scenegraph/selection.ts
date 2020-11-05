@@ -59,4 +59,28 @@ export class Selection {
     });
     return res;
   }
+
+  get boundsInParent(): Bounds | null {
+    if (!this.items.length) return null;
+    if (this.items.length === 1) return this.items[0].boundsInParent;
+    let rectList: Bounds[] = [];
+    this.items.forEach((v) => {
+      const bounds = v.boundsInParent;
+      let d = {
+        x: bounds.x,
+        y: bounds.y,
+        width: bounds.width,
+        height: bounds.height,
+      };
+      rectList.push(d);
+    });
+    const res = rectList.reduce((a, b) => {
+      let x = Math.min(a.x, b.x);
+      let y = Math.min(a.y, b.y);
+      let width = Math.max(a.x + a.width - x, b.x + b.width - x);
+      let height = Math.max(a.y + a.height - y, b.y + b.height - y);
+      return { x, y, width, height };
+    });
+    return res;
+  }
 }

@@ -4,6 +4,8 @@ import React, { useRef } from "react";
 import { IBoundingRect } from "../../draw/shape";
 import { useStores } from "../../hooks/useStores";
 import styled from "../../styles/styled";
+import { Point } from "../../utils/geometry";
+import { getBoundingRectPoints } from "../../xd/sceneNode.helpers";
 
 type ResizeEdge =
   | "n"
@@ -114,30 +116,44 @@ const ResizeAndRotate = () => {
   const { e, f } = canvasStore.transform || {};
 
   const getStyles = (): React.CSSProperties => {
-    if (!canvasStore.selection.items.length) return {};
-    let rectList: IBoundingRect[] = [];
-    canvasStore.selection.items.forEach((v) => {
-      let d = {
-        x: v.globalBounds.x,
-        y: v.globalBounds.y,
-        width: v.globalBounds.width,
-        height: v.globalBounds.height,
+    let items = canvasStore.selection.items;
+    if (!items.length) return {};
+    let res: IBoundingRect;
+    if (items.length === 1) {
+      let item = items[0];
+      res = item.globalBounds;
+    } else {
+      let vertexList: Point[] = [];
+      items.forEach((v) => {
+        vertexList = vertexList.concat(
+          getBoundingRectPoints(v.localBounds, v.transform)
+        );
+      });
+      let minX = Number.MAX_SAFE_INTEGER;
+      let minY = Number.MAX_SAFE_INTEGER;
+      let maxX = Number.MIN_SAFE_INTEGER;
+      let maxY = Number.MIN_SAFE_INTEGER;
+      vertexList.forEach((v) => {
+        if (v.x > maxX) maxX = v.x;
+        if (v.x < minX) minX = v.x;
+        if (v.y > maxY) maxY = v.y;
+        if (v.y < minY) minY = v.y;
+      });
+      res = {
+        x: minX,
+        y: minY,
+        width: maxX - minX,
+        height: maxY - minY,
       };
-      rectList.push(d);
-    });
-    // console.log(rectList);
-    const res = rectList.reduce((a, b) => {
-      let x = Math.min(a.x, b.x);
-      let y = Math.min(a.y, b.y);
-      let width = Math.max(a.x + a.width - x, b.x + b.width - x);
-      let height = Math.max(a.y + a.height - y, b.y + b.height - y);
-      return { x, y, width, height };
-    });
+    }
+
+    let rotateDeg = items.length === 1 ? items[0].rotation : 0;
     return {
       top: res.y * scale + (f ?? 0) / dpr,
       left: res.x * scale + (e ?? 0) / dpr,
       width: res.width * scale,
       height: res.height * scale,
+      transform: `rotate(${rotateDeg}deg)`,
     };
   };
 

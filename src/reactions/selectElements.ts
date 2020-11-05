@@ -8,7 +8,7 @@ import { RootNode } from "../draw/elements/rootNode";
 import { IRenderEventTarget, RenderMouseEvent } from "../draw/event";
 import { isRectOverlap, RectPoints } from "../utils/geometry";
 import { SceneNode } from "../xd/scenegraph/sceneNode";
-import { boundsToRectPoints } from "../xd/sceneNode.helpers";
+import { getBoundingRectPoints } from "../xd/sceneNode.helpers";
 
 const { uiStore, canvasStore, canvasMouseStore } = globalStores;
 
@@ -122,9 +122,9 @@ export const createSelectElementsReaction = () => {
           if (current instanceof Artboard) {
             list.push(...current.children);
           } else {
-            const rectPath = boundsToRectPoints(
-              current.globalBounds,
-              current.rotation
+            const rectPath = getBoundingRectPoints(
+              current.localBounds,
+              current.transform
             );
             if (isRectOverlap(rectPath, selectionRectPath)) {
               selectedElements.add(current);

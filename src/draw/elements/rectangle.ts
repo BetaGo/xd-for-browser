@@ -28,7 +28,10 @@ export class Rectangle
       translation: computed,
       width: observable,
       height: observable,
-      rotation: computed,
+      rotation: observable,
+      boundsInParent: computed,
+      localBounds: computed,
+      globalBounds: computed,
     });
   }
 

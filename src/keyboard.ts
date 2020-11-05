@@ -69,6 +69,28 @@ export function listenKeyboardEvents() {
     });
   });
 
+  keyboardJS.bind("backspace", (e: any) => {
+    if (e?.target?.tagName?.toUpperCase() === "INPUT") return;
+    runInAction(() => {
+      globalStores.canvasStore.selection.items.forEach((item) => {
+        item.removeFromParent();
+      });
+      globalStores.canvasStore.selection.items = [];
+      globalStores.canvasStore.render();
+    });
+  });
+
+  keyboardJS.bind("delete", (e: any) => {
+    if (e?.target?.tagName?.toUpperCase() === "INPUT") return;
+    runInAction(() => {
+      globalStores.canvasStore.selection.items.forEach((item) => {
+        item.removeFromParent();
+      });
+      globalStores.canvasStore.selection.items = [];
+      globalStores.canvasStore.render();
+    });
+  });
+
   keyboardJS.bind("ctrl + shift + y", (e) => {
     e?.preventDefault();
     runInAction(() => {

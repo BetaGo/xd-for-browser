@@ -220,7 +220,7 @@ export class Matrix {
   }
 }
 
-export function createTransformMatrix(tx: number, ty: number): Matrix {
+export function createTranslateMatrix(tx: number, ty: number): Matrix {
   return new Matrix(1, 0, 0, 1, tx, ty);
 }
 

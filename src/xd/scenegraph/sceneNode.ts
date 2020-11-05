@@ -40,6 +40,10 @@ export abstract class SceneNode {
   markedForExport: boolean = false;
   parent: SceneNode | null = null;
   selected: boolean = false;
+  /**
+   * degrees
+   */
+  rotation: number = 0;
 
   get localCenterPoint(): Point {
     return {
@@ -60,10 +64,6 @@ export abstract class SceneNode {
   readonly children: SceneNode[] = [];
   readonly transform: Matrix = createIdentityMatrix();
 
-  /**
-   * degrees
-   */
-  abstract get rotation(): number;
   abstract get globalBounds(): Bounds;
   abstract get localBounds(): Bounds;
   abstract get boundsInParent(): Bounds;

@@ -15,11 +15,6 @@ export class Artboard extends GraphicNode {
   locked = false;
   markedForExport = false;
 
-  get rotation() {
-    // TODO:
-    return 0;
-  }
-
   get globalBounds(): Bounds {
     return {
       x: this.transform.e,
@@ -31,8 +26,8 @@ export class Artboard extends GraphicNode {
 
   get localBounds(): Bounds {
     return {
-      x: this.transform.e,
-      y: this.transform.f,
+      x: 0,
+      y: 0,
       width: this.width,
       height: this.height,
     };

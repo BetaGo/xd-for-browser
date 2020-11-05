@@ -101,8 +101,10 @@ const SizeAndPosition = () => {
         break;
       }
       case "r": {
-        // const r = v % 360;
-        // TODO: rotate each node
+        const r = v % 360;
+        canvasStore.selection.items.forEach((item) => {
+          item.rotateAround(r - item.rotation, item.localCenterPoint);
+        });
         break;
       }
     }
@@ -115,9 +117,9 @@ const SizeAndPosition = () => {
         isQuiet
         autoSelect
         value={data.w.toString()}
-        onChange={(e) => {
-          setData({ ...data, w: e });
-        }}
+        // onChange={(e) => {
+        //   setData({ ...data, w: e });
+        // }}
         onBlur={handleUpdate("w")}
       />
       <Input
@@ -125,9 +127,9 @@ const SizeAndPosition = () => {
         isQuiet
         autoSelect
         value={data.h.toString()}
-        onChange={(e) => {
-          setData({ ...data, h: e });
-        }}
+        // onChange={(e) => {
+        //   setData({ ...data, h: e });
+        // }}
         onBlur={handleUpdate("h")}
       />
       <Input
@@ -135,9 +137,9 @@ const SizeAndPosition = () => {
         isQuiet
         autoSelect
         value={data.x.toString()}
-        onChange={(e) => {
-          setData({ ...data, x: e });
-        }}
+        // onChange={(e) => {
+        //   setData({ ...data, x: e });
+        // }}
         onBlur={handleUpdate("x")}
       />
       <Input
@@ -145,9 +147,9 @@ const SizeAndPosition = () => {
         isQuiet
         autoSelect
         value={data.y.toString()}
-        onChange={(e) => {
-          setData({ ...data, y: e });
-        }}
+        // onChange={(e) => {
+        //   setData({ ...data, y: e });
+        // }}
         onBlur={handleUpdate("y")}
       />
       <Input
@@ -155,9 +157,9 @@ const SizeAndPosition = () => {
         isQuiet
         autoSelect
         value={data.r.toString()}
-        onChange={(e) => {
-          setData({ ...data, r: e });
-        }}
+        // onChange={(e) => {
+        //   setData({ ...data, r: e });
+        // }}
         onBlur={handleUpdate("r")}
         addonAfter="°"
       />

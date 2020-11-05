@@ -1,5 +1,7 @@
+import { degree2Radian } from "../../utils/math";
 import { Bounds, Point } from "../typedefs";
 import { GraphicNode } from "./graphicNode";
+import { createRotateMatrix, createTranslateMatrix } from "./matrix";
 
 export class Rectangle extends GraphicNode {
   hasLinkedGraphicFill: boolean = false;
@@ -38,11 +40,6 @@ export class Rectangle extends GraphicNode {
     return false;
   }
 
-  get rotation(): number {
-    // TODO:
-    return 0;
-  }
-
   get globalBounds(): Bounds {
     return {
       x: this.transform.e,
@@ -52,19 +49,17 @@ export class Rectangle extends GraphicNode {
     };
   }
   get localBounds(): Bounds {
-    // TODO:
     return {
-      x: this.transform.e,
-      y: this.transform.f,
+      x: 0,
+      y: 0,
       width: this.width,
       height: this.height,
     };
   }
   get boundsInParent(): Bounds {
-    // TODO:
     return {
-      x: 0,
-      y: 0,
+      x: this.transform.e - (this.parent?.transform.e ?? 0),
+      y: this.transform.f - (this.parent?.transform.f ?? 0),
       width: this.width,
       height: this.height,
     };
@@ -118,8 +113,15 @@ export class Rectangle extends GraphicNode {
     throw new Error("Method not implemented.");
   }
   rotateAround(deltaAngle: number, rotationCenter: Point): void {
-    // TODO:
-    throw new Error("Method not implemented.");
+    let center = this.transform.transformPoint(rotationCenter);
+    this.rotation = (this.rotation + deltaAngle) % 360;
+    let deltaRadian = degree2Radian(deltaAngle);
+    const tx = center.x;
+    const ty = center.y;
+    const m = createTranslateMatrix(-tx, -ty)
+      .multiLeft(createRotateMatrix(deltaRadian))
+      .multiLeft(createTranslateMatrix(tx, ty));
+    this.transform.multiLeft(m);
   }
   resize(width: number, height: number): void {
     // TODO:
