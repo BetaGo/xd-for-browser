@@ -7,17 +7,18 @@ import styled from "../../styles/styled";
 import { Point } from "../../utils/geometry";
 import { getBoundingRectPoints } from "../../xd/sceneNode.helpers";
 
-type ResizeEdge =
-  | "n"
-  | "e"
-  | "s"
-  | "w"
-  | "ne"
-  | "nw"
-  | "se"
-  | "sw"
-  | "ew"
-  | "ns";
+type ResizeEdge = "n" | "e" | "s" | "w" | "ne" | "nw" | "se" | "sw";
+
+const edgeRotateDegreeDict: Record<ResizeEdge, number> = {
+  n: 0,
+  e: 90,
+  s: 180,
+  w: 270,
+  ne: 45,
+  nw: 315,
+  se: 135,
+  sw: 225,
+};
 
 const Root = styled.div`
   position: absolute;
@@ -26,53 +27,72 @@ const Root = styled.div`
   outline: 1px solid ${({ theme }) => theme.palette.primary};
 `;
 
-const getControlPointPositionStyle = (edge: ResizeEdge): string => {
+const getControlPointPositionStyle = (
+  edge: ResizeEdge,
+  rotation: number
+): string => {
+  let r =
+    ((rotation % 45 > 22.5 ? 1 : 0) + Math.floor(rotation / 45)) * 45 +
+    edgeRotateDegreeDict[edge];
+  r = ((r % 180) + 180) % 180;
+
+  let cursor = "";
+  if (r / 45 === 0) {
+    cursor = "ns-resize";
+  } else if (r / 45 === 1) {
+    cursor = "nesw-resize";
+  } else if (r / 45 === 2) {
+    cursor = "ew-resize";
+  } else if (r / 45 === 3) {
+    cursor = "nwse-resize";
+  }
+
   switch (edge) {
     case "nw":
       return `
-        cursor: nwse-resize;
+        cursor: ${cursor};
         top: -5px;
         left: -5px;
       `;
     case "n":
       return `
-        cursor: n-resize;
+        cursor: ${cursor};
         top: -5px;
         left: calc(50% - 4px);
       `;
     case "ne":
       return `
-        cursor: nesw-resize;
+        cursor: ${cursor};
         top: -5px;
         right: -5px;
       `;
     case "e":
       return `
-        cursor: ew-resize;
+        cursor: ${cursor};
         top: calc(50% - 4px);
         right: -5px;
       `;
     case "se":
       return `
-        cursor: nwse-resize;
+        cursor: ${cursor};
         bottom: -5px;
         right: -5px;
       `;
     case "s":
       return `
-        cursor: ns-resize;
+        cursor: ${cursor};
         bottom: -5px;
         left: calc(50% - 4px);
       `;
     case "sw":
       return `
-        cursor: nesw-resize;
+        cursor: ${cursor};
         bottom: -5px;
         left: -5px;
       `;
     case "w":
       return `
-        cursor: ew-resize;
+        cursor: ${cursor};
         top: calc(50% - 4px);
         left: -5px;
       `;
@@ -81,12 +101,16 @@ const getControlPointPositionStyle = (edge: ResizeEdge): string => {
   }
 };
 
-const ControlPoint = styled.div<{ resizeEdge: ResizeEdge }>`
+const ControlPoint = styled.div<{
+  resizeEdge: ResizeEdge;
+  currentRotation: number;
+}>`
+  ${({ resizeEdge, currentRotation }) =>
+    getControlPointPositionStyle(resizeEdge, currentRotation)}
   position: absolute;
-  pointer-events: none;
+  pointer-events: all;
   width: 8px;
   height: 8px;
-  ${({ resizeEdge }) => getControlPointPositionStyle(resizeEdge)}
   border: 1px solid ${({ theme }) => theme.palette.primary};
   border-radius: 50%;
   background-color: #fff;
@@ -94,22 +118,12 @@ const ControlPoint = styled.div<{ resizeEdge: ResizeEdge }>`
   &:hover {
     background-color: ${({ theme }) => theme.palette.primary};
   }
-
-  /* &::after {
-    position: absolute;
-    content: "";
-    display: block;
-    cursor: s-resize;
-    width: 5px;
-    height: 5px;
-    background: red;
-    right: 2px;
-  } */
 `;
 
-const ResizeAndRotate = () => {
+const Resize = () => {
   const { canvasStore } = useStores();
   const selectedEdgeRef = useRef<ResizeEdge | null>(null);
+  const rotationRef = useRef(0);
 
   const dpr = canvasStore.dpr;
   const scale = canvasStore.zoomValue;
@@ -148,6 +162,7 @@ const ResizeAndRotate = () => {
     }
 
     let rotateDeg = items.length === 1 ? items[0].rotation : 0;
+    rotationRef.current = rotateDeg;
     return {
       top: res.y * scale + (f ?? 0) / dpr,
       left: res.x * scale + (e ?? 0) / dpr,
@@ -184,18 +199,20 @@ const ResizeAndRotate = () => {
   return (
     <Root style={styles}>
       <ControlPoint
+        currentRotation={rotationRef.current}
         resizeEdge="nw"
-        draggable
+        // draggable
         onDragStart={() => {
           console.log("dddstart");
           selectedEdgeRef.current = "nw";
         }}
         onDrag={handleOnDrag}
         onDragEnd={handleDragEnd}
-      />
+      ></ControlPoint>
       <ControlPoint
+        currentRotation={rotationRef.current}
         resizeEdge="n"
-        draggable
+        // draggable
         onDragStart={(e) => {
           selectedEdgeRef.current = "n";
         }}
@@ -203,8 +220,9 @@ const ResizeAndRotate = () => {
         onDragEnd={handleDragEnd}
       />
       <ControlPoint
+        currentRotation={rotationRef.current}
         resizeEdge="ne"
-        draggable
+        // draggable
         onDragStart={(e) => {
           selectedEdgeRef.current = "ne";
         }}
@@ -212,8 +230,9 @@ const ResizeAndRotate = () => {
         onDragEnd={handleDragEnd}
       />
       <ControlPoint
+        currentRotation={rotationRef.current}
         resizeEdge="e"
-        draggable
+        // draggable
         onDragStart={(e) => {
           selectedEdgeRef.current = "e";
         }}
@@ -221,8 +240,9 @@ const ResizeAndRotate = () => {
         onDragEnd={handleDragEnd}
       />
       <ControlPoint
+        currentRotation={rotationRef.current}
         resizeEdge="se"
-        draggable
+        // draggable
         onDragStart={(e) => {
           selectedEdgeRef.current = "se";
         }}
@@ -230,8 +250,9 @@ const ResizeAndRotate = () => {
         onDragEnd={handleDragEnd}
       />
       <ControlPoint
+        currentRotation={rotationRef.current}
         resizeEdge="s"
-        draggable
+        // draggable
         onDragStart={(e) => {
           selectedEdgeRef.current = "w";
         }}
@@ -239,8 +260,9 @@ const ResizeAndRotate = () => {
         onDragEnd={handleDragEnd}
       />
       <ControlPoint
+        currentRotation={rotationRef.current}
         resizeEdge="sw"
-        draggable
+        // draggable
         onDragStart={(e) => {
           selectedEdgeRef.current = "sw";
         }}
@@ -248,8 +270,9 @@ const ResizeAndRotate = () => {
         onDragEnd={handleDragEnd}
       />
       <ControlPoint
+        currentRotation={rotationRef.current}
         resizeEdge="w"
-        draggable
+        // draggable
         onDragStart={(e) => {
           selectedEdgeRef.current = "w";
         }}
@@ -260,4 +283,4 @@ const ResizeAndRotate = () => {
   );
 };
 
-export default observer(ResizeAndRotate);
+export default observer(Resize);

@@ -73,4 +73,16 @@ export class CanvasStore {
     this.transform = this.gRender.transform.clone();
     this.gRender?.render();
   }
+
+  clientPoint2CanvasPoint(point: Point): Point {
+    if (!this.gRender) return point;
+    const rect = this.gRender.canvasElement.getBoundingClientRect();
+    const domX = point.x - rect.x;
+    const tx = this.transform?.e ?? 0;
+    const domY = point.y - rect.y;
+    const ty = this.transform?.f ?? 0;
+    const x = (domX - tx / this.dpr) / this.zoomValue;
+    const y = (domY - ty / this.dpr) / this.zoomValue;
+    return { x, y };
+  }
 }

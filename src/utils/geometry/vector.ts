@@ -62,4 +62,10 @@ export class Vector {
     const p = this.perpendicular();
     return p.normalize();
   }
+
+  getAngle(vector: Vector): number {
+    let cosA =
+      this.dotProduct(vector) / (this.getMagnitude() * vector.getMagnitude());
+    return Math.acos(cosA);
+  }
 }

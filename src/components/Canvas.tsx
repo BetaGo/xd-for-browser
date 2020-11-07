@@ -10,9 +10,11 @@ import { useStores } from "../hooks/useStores";
 import styled from "../styles/styled";
 import ArtboardTitle from "./canvas-controls/ArtboardTitle";
 import PositionTip from "./canvas-controls/PositionTip";
-import ResizeAndRotate from "./canvas-controls/ResizeAndRotate";
+// import ResizeAndRotate from "./canvas-controls/ResizeAndRotate";
 import Selection from "./canvas-controls/Selection";
 import CanvasContextMenu from "./CanvasContextMenu";
+import Resize from "./canvas-controls/Resize";
+import Rotate from "./canvas-controls/Rotate";
 
 const Root = styled.div`
   position: relative;
@@ -162,7 +164,9 @@ const Canvas = () => {
           <ArtboardTitle artboard={v as Artboard} key={v.guid} />
         ))}
         <Selection></Selection>
-        <ResizeAndRotate></ResizeAndRotate>
+        {/* <ResizeAndRotate></ResizeAndRotate> */}
+        <Resize />
+        <Rotate />
         <PositionTip />
       </OperationLayer>
       <CanvasContextMenu />
