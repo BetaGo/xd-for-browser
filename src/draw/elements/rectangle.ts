@@ -28,7 +28,7 @@ export class Rectangle
       translation: computed,
       width: observable,
       height: observable,
-      rotation: observable,
+      rotation: computed,
       boundsInParent: computed,
       localBounds: computed,
       globalBounds: computed,
@@ -37,14 +37,15 @@ export class Rectangle
 
   render(gRender: GRender) {
     const ctx = gRender.canvasCtx2D;
+    let transform = this.globalTransform;
     ctx.save();
     ctx.transform(
-      this.transform.a,
-      this.transform.b,
-      this.transform.c,
-      this.transform.d,
-      this.transform.e,
-      this.transform.f
+      transform.a,
+      transform.b,
+      transform.c,
+      transform.d,
+      transform.e,
+      transform.f
     );
     if (this.fillEnabled && this.fill) {
       if (this.fill instanceof Color) {
@@ -79,7 +80,7 @@ export class Rectangle
     ];
 
     const transformedRegion = region.map((v) => {
-      return this.transform.transformPoint(v);
+      return this.globalTransform.transformPoint(v);
     });
 
     return pointInRegionWN(point, transformedRegion);

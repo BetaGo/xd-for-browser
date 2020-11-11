@@ -140,7 +140,7 @@ const Resize = () => {
       let vertexList: Point[] = [];
       items.forEach((v) => {
         vertexList = vertexList.concat(
-          getBoundingRectPoints(v.localBounds, v.transform)
+          getBoundingRectPoints(v.localBounds, v.globalTransform)
         );
       });
       let minX = Number.MAX_SAFE_INTEGER;

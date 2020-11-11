@@ -6,7 +6,7 @@ import { Artboard } from "../draw/elements/artboard";
 import { isRectOverlap } from "../utils/geometry";
 import { Matrix } from "../xd/scenegraph/matrix";
 import { SceneNode } from "../xd/scenegraph/sceneNode";
-import { getBoundingRectPoints } from "../xd/sceneNode.helpers";
+import { getBoundingRectPoints, moveNode } from "../xd/sceneNode.helpers";
 
 const { uiStore, canvasStore, canvasMouseStore } = globalStores;
 
@@ -47,11 +47,11 @@ export const createMoveElementsReaction = () => {
           canvasStore.artboards.forEach((artboard) => {
             const artboardRectPath = getBoundingRectPoints(
               artboard.localBounds,
-              artboard.transform
+              artboard.globalTransform
             );
             const currentRectPath = getBoundingRectPoints(
               current.localBounds,
-              current.transform
+              current.globalTransform
             );
             if (isRectOverlap(artboardRectPath, currentRectPath)) {
               const parents = elementParentArtboardMap.get(current) || [];
@@ -61,8 +61,9 @@ export const createMoveElementsReaction = () => {
           });
           let parents = elementParentArtboardMap.get(current);
           if (!parents || parents.length === 0) {
-            current.removeFromParent();
-            canvasStore.gRender?.rootNode.addChild(current);
+            let rootNode = canvasStore.gRender?.rootNode;
+            if (!rootNode) return;
+            moveNode(current, rootNode);
           } else {
             if (
               !(
@@ -70,8 +71,7 @@ export const createMoveElementsReaction = () => {
                 parents.includes(current.parent)
               )
             ) {
-              current.removeFromParent();
-              parents[0].addChild(current);
+              moveNode(current, parents[0]);
             }
           }
           transformMap.delete(v);
@@ -89,7 +89,7 @@ export const createMoveElementsReaction = () => {
       } = d;
       if (!transformList.length) {
         transformList = [...selectedElements].map((v) => {
-          let transformSnapShort = v.transform.clone();
+          let transformSnapShort = v.globalTransform.clone();
           transformMap.set(transformSnapShort, v);
           return transformSnapShort;
         });
@@ -100,13 +100,14 @@ export const createMoveElementsReaction = () => {
         Math.abs(currentMouseY - mouseDownY!) > Number.EPSILON
       ) {
         transformList.forEach((transform) => {
-          const dx = mouseDownX! - transform.e;
-          const dy = mouseDownY! - transform.f;
-
-          const targetX = currentMouseX - dx;
-          const targetY = currentMouseY - dy;
           const currentElement = transformMap.get(transform);
           if (currentElement) {
+            const dx = mouseDownX! - transform.e;
+            const dy = mouseDownY! - transform.f;
+            const targetX =
+              currentMouseX - dx - (currentElement.parent?.transform.e ?? 0);
+            const targetY =
+              currentMouseY - dy - (currentElement.parent?.transform.f ?? 0);
             currentElement.transform.e = targetX;
             currentElement.transform.f = targetY;
           }

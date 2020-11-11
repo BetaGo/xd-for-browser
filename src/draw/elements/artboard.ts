@@ -31,14 +31,15 @@ export class Artboard
 
   render(gRender: GRender) {
     const ctx = gRender.canvasCtx2D;
+    let transform = this.globalTransform;
     ctx.save();
     ctx.transform(
-      this.transform.a,
-      this.transform.b,
-      this.transform.c,
-      this.transform.d,
-      this.transform.e,
-      this.transform.f
+      transform.a,
+      transform.b,
+      transform.c,
+      transform.d,
+      transform.e,
+      transform.f
     );
     if (this.fillEnabled && this.fill) {
       if (this.fill instanceof Color) {
@@ -61,11 +62,14 @@ export class Artboard
 
   isInnerPoint(point: Point): boolean {
     const region: Point[] = [
-      { x: this.transform.e, y: this.transform.f },
-      { x: this.transform.e + this.width, y: this.transform.f },
-      { x: this.transform.e + this.width, y: this.transform.f + this.height },
-      { x: this.transform.e, y: this.transform.f + this.height },
-      { x: this.transform.e, y: this.transform.f },
+      { x: this.globalTransform.e, y: this.globalTransform.f },
+      { x: this.globalTransform.e + this.width, y: this.globalTransform.f },
+      {
+        x: this.globalTransform.e + this.width,
+        y: this.globalTransform.f + this.height,
+      },
+      { x: this.globalTransform.e, y: this.globalTransform.f + this.height },
+      { x: this.globalTransform.e, y: this.globalTransform.f },
     ];
     return pointInRegionWN(point, region);
   }

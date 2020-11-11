@@ -32,3 +32,20 @@ export const typeofNode = (node: SceneNode) => {
   // TODO: continue
   return null;
 };
+
+export const moveNode = (
+  element: SceneNode,
+  targetElement: Artboard | RootNode
+) => {
+  element.transform.e +=
+    (element.parent?.globalTransform.e ?? 0) - targetElement.globalTransform.e;
+  element.transform.f +=
+    (element.parent?.globalTransform.f ?? 0) - targetElement.globalTransform.f;
+  element.removeFromParent();
+  targetElement.addChild(element);
+};
+
+// export const globalPoint2LocalPoint = (
+//   node: SceneNode,
+//   globalPoint: Point
+// ): Point => {};

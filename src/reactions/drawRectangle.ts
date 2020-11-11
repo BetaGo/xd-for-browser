@@ -6,6 +6,7 @@ import { Rectangle } from "../draw/elements/rectangle";
 import { RootNode } from "../draw/elements/rootNode";
 import { Point } from "../utils/geometry";
 import { Color } from "../xd/scenegraph/color";
+import { moveNode } from "../xd/sceneNode.helpers";
 
 const { uiStore, canvasStore, canvasMouseStore } = globalStores;
 
@@ -30,20 +31,19 @@ export const createDrawRectReaction = () => {
         if (creatingRect) {
           if (creatingRect.parent instanceof RootNode) {
             const endPoint: Point = {
-              x: creatingRect.transform.e,
-              y: creatingRect.transform.f,
+              x: creatingRect.globalTransform.e,
+              y: creatingRect.globalTransform.f,
             };
             const startPoint: Point = {
-              x: creatingRect.transform.e + creatingRect.width,
-              y: creatingRect.transform.f + creatingRect.height,
+              x: creatingRect.globalTransform.e + creatingRect.width,
+              y: creatingRect.globalTransform.f + creatingRect.height,
             };
             for (let artboard of canvasStore.artboards) {
               if (
                 artboard.isInnerPoint(startPoint) ||
                 artboard.isInnerPoint(endPoint)
               ) {
-                creatingRect.removeFromParent();
-                artboard.addChild(creatingRect);
+                moveNode(creatingRect, artboard);
                 return;
               }
             }
@@ -70,8 +70,6 @@ export const createDrawRectReaction = () => {
         creatingRect.height = height;
         creatingRect.fill = new Color("#fff");
         creatingRect.stroke = new Color("#707070");
-        creatingRect.transform.e = x;
-        creatingRect.transform.f = y;
 
         const startPoint: Point = { x: mouseDownX!, y: mouseDownY! };
         canvasStore.gRender?.rootNode?.addChild(creatingRect);
@@ -82,11 +80,17 @@ export const createDrawRectReaction = () => {
             break;
           }
         }
+        creatingRect.transform.e =
+          x - (creatingRect.parent?.globalTransform.e ?? 0);
+        creatingRect.transform.f =
+          y - (creatingRect.parent?.globalTransform.f ?? 0);
 
         canvasStore.selection.items = [creatingRect];
       } else {
-        creatingRect.transform.e = x;
-        creatingRect.transform.f = y;
+        creatingRect.transform.e =
+          x - (creatingRect.parent?.globalTransform.e ?? 0);
+        creatingRect.transform.f =
+          y - (creatingRect.parent?.globalTransform.f ?? 0);
         creatingRect.width = width;
         creatingRect.height = height;
       }

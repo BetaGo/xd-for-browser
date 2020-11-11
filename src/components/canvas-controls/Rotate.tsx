@@ -198,11 +198,24 @@ const ResizeAndRotate = () => {
       if (isRotateLeft) {
         rotateDeg = -rotateDeg;
       }
-      const canvasCenter = canvasStore.clientPoint2CanvasPoint(rotateCenter);
-      console.log(canvasCenter);
+      // const canvasCenter = canvasStore.clientPoint2CanvasPoint(rotateCenter);
       runInAction(() => {
         canvasStore.selection.items.forEach((node) => {
-          node.rotateAround(rotateDeg, canvasCenter);
+          // let globalBounds = node.globalBounds;
+          // const rotateCenter: Point = {
+          //   x: canvasCenter.x - globalBounds.x,
+          //   y: canvasCenter.y - globalBounds.y,
+          // };
+          // const nodeCenter = node.globalTransform.transformPoint(
+          //   node.localCenterPoint
+          // );
+          // const rotateCenter = {
+          //   x: canvasCenter.x - nodeCenter.x,
+          //   y: canvasCenter.y - nodeCenter.y,
+          // };
+          // console.log(rotateCenter);
+          const rotateCenter = node.localCenterPoint;
+          node.rotateAround(rotateDeg, rotateCenter);
         });
         canvasStore.render();
       });
@@ -241,7 +254,7 @@ const ResizeAndRotate = () => {
       let vertexList: Point[] = [];
       items.forEach((v) => {
         vertexList = vertexList.concat(
-          getBoundingRectPoints(v.localBounds, v.transform)
+          getBoundingRectPoints(v.localBounds, v.globalTransform)
         );
       });
       let minX = Number.MAX_SAFE_INTEGER;

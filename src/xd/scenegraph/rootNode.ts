@@ -5,8 +5,6 @@ export class RootNode extends SceneNode {
   isInArtworkTree = true;
   isContainer = true;
 
-  rotation = 0;
-
   get globalBounds(): Bounds {
     const boundsList = this.children.map((v) => v.globalBounds);
     return mergeBounds(boundsList);

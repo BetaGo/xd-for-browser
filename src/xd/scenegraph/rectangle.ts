@@ -42,8 +42,8 @@ export class Rectangle extends GraphicNode {
 
   get globalBounds(): Bounds {
     return {
-      x: this.transform.e,
-      y: this.transform.f,
+      x: this.globalTransform.e,
+      y: this.globalTransform.f,
       width: this.width,
       height: this.height,
     };
@@ -114,7 +114,8 @@ export class Rectangle extends GraphicNode {
   }
   rotateAround(deltaAngle: number, rotationCenter: Point): void {
     let center = this.transform.transformPoint(rotationCenter);
-    this.rotation = (this.rotation + deltaAngle) % 360;
+    // this.rotation = (this.rotation + deltaAngle) % 360;
+
     let deltaRadian = degree2Radian(deltaAngle);
     const tx = center.x;
     const ty = center.y;

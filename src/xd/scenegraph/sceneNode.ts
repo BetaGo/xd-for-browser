@@ -1,4 +1,8 @@
+import * as math from "mathjs";
 import { v4 as uuidv4 } from "uuid";
+
+import { Vector } from "../../utils/geometry/vector";
+import { radian2Degree } from "../../utils/math";
 import { Bounds, Interaction, Point } from "../typedefs";
 import { createIdentityMatrix, Matrix } from "./matrix";
 
@@ -43,7 +47,38 @@ export abstract class SceneNode {
   /**
    * degrees
    */
-  rotation: number = 0;
+  set rotation(degree: number) {
+    this.rotateAround(degree - this.rotation, this.localCenterPoint);
+  }
+
+  get rotation(): number {
+    let centerPoint: Point = { x: 0, y: 0 };
+    let point: Point = { x: 1, y: 0 };
+    let tCenterPoint = this.transform.transformPoint(centerPoint);
+    let tPoint = this.transform.transformPoint(point);
+    let startVec = new Vector(point);
+    let currentVec = new Vector(
+      tPoint.x - tCenterPoint.x,
+      tPoint.y - tCenterPoint.y
+    );
+    const isRotateLeft =
+      (math.cross(
+        [currentVec.x, currentVec.y, 0],
+        [startVec.x, startVec.y, 0]
+      ) as number[])[2] > 0
+        ? true
+        : false;
+    let rotateDeg = radian2Degree(currentVec.getAngle(startVec));
+    return isRotateLeft ? -rotateDeg : rotateDeg;
+  }
+
+  get globalTransform() {
+    let transform = this.transform;
+    if (this.parent) {
+      transform = this.transform.clone().multiLeft(this.parent.transform);
+    }
+    return transform;
+  }
 
   get localCenterPoint(): Point {
     return {

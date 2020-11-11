@@ -124,7 +124,7 @@ export const createSelectElementsReaction = () => {
           } else {
             const rectPath = getBoundingRectPoints(
               current.localBounds,
-              current.transform
+              current.globalTransform
             );
             if (isRectOverlap(rectPath, selectionRectPath)) {
               selectedElements.add(current);
