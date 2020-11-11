@@ -33,16 +33,10 @@ export class Ellipse extends GraphicNode {
   restToAutoConstraints(): void {
     throw new Error("Method not implemented.");
   }
-  removeFromParent(): void {
-    throw new Error("Method not implemented.");
-  }
   moveInParentCoordinates(deltaX: number, deltaY: number): void {
     throw new Error("Method not implemented.");
   }
   placeInParentCoordinates(registrationPoint: Point, parentPoint: Point): void {
-    throw new Error("Method not implemented.");
-  }
-  rotateAround(deltaAngle: number, rotationCenter: Point): void {
     throw new Error("Method not implemented.");
   }
   resize(width: number, height: number): void {
@@ -85,8 +79,8 @@ export class Ellipse extends GraphicNode {
 
   get globalBounds(): Bounds {
     return {
-      x: this.transform.e,
-      y: this.transform.f,
+      x: this.globalTransform.e,
+      y: this.globalTransform.f,
       width: this.radiusX * 2,
       height: this.radiusY * 2,
     };

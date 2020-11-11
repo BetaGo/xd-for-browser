@@ -1,21 +1,30 @@
 import ArtboardIcon from "@spectrum-icons/workflow/Artboard";
 import EllipseIcon from "@spectrum-icons/workflow/Ellipse";
-import LayersIcon from "@spectrum-icons/workflow/Layers";
+// import LayersIcon from "@spectrum-icons/workflow/Layers";
 import LineIcon from "@spectrum-icons/workflow/Line";
-import AssetsIcon from "@spectrum-icons/workflow/PaddingTop";
+// import AssetsIcon from "@spectrum-icons/workflow/PaddingTop";
 import PolygonIcon from "@spectrum-icons/workflow/Polygon";
 import RectangleIcon from "@spectrum-icons/workflow/Rectangle";
-import ZoomIcon from "@spectrum-icons/workflow/Search";
+// import ZoomIcon from "@spectrum-icons/workflow/Search";
 import SelectIcon from "@spectrum-icons/workflow/Select";
-import TextIcon from "@spectrum-icons/workflow/Text";
-import VectorDrawIcon from "@spectrum-icons/workflow/VectorDraw";
+// import TextIcon from "@spectrum-icons/workflow/Text";
+// import VectorDrawIcon from "@spectrum-icons/workflow/VectorDraw";
 import { runInAction } from "mobx";
 import { observer } from "mobx-react";
 import React from "react";
 
-import { DesignTool, OtherTool } from "../constants";
+import {
+  DesignTool,
+  // OtherTool
+} from "../constants";
 import { useStores } from "../hooks/useStores";
 import styled from "../styles/styled";
+
+interface IToolData {
+  name: string;
+  value: number;
+  icon: JSX.Element;
+}
 
 const Root = styled.div`
   cursor: pointer;
@@ -35,7 +44,7 @@ const ToolItem = styled.div<{ active: boolean }>`
   color: ${({ theme, active }) => active && theme.palette.icon.informative};
 `;
 
-const designToolsData = [
+const designToolsData: IToolData[] = [
   {
     name: "Select",
     value: DesignTool.Select,
@@ -61,39 +70,39 @@ const designToolsData = [
     value: DesignTool.Line,
     icon: <LineIcon size="S" />,
   },
-  {
-    name: "Pen",
-    value: DesignTool.Pen,
-    icon: <VectorDrawIcon size="S" />,
-  },
-  {
-    name: "Text",
-    value: DesignTool.Text,
-    icon: <TextIcon size="S" />,
-  },
+  // {
+  //   name: "Pen",
+  //   value: DesignTool.Pen,
+  //   icon: <VectorDrawIcon size="S" />,
+  // },
+  // {
+  //   name: "Text",
+  //   value: DesignTool.Text,
+  //   icon: <TextIcon size="S" />,
+  // },
   {
     name: "Artboard",
     value: DesignTool.Artboard,
     icon: <ArtboardIcon size="S" />,
   },
-  {
-    name: "Zoom",
-    value: DesignTool.Zoom,
-    icon: <ZoomIcon size="S" />,
-  },
+  // {
+  //   name: "Zoom",
+  //   value: DesignTool.Zoom,
+  //   icon: <ZoomIcon size="S" />,
+  // },
 ];
 
-const otherToolsData = [
-  {
-    name: "Assets",
-    value: OtherTool.Assets,
-    icon: <AssetsIcon size="S" />,
-  },
-  {
-    name: "Layers",
-    value: OtherTool.Layers,
-    icon: <LayersIcon size="S" />,
-  },
+const otherToolsData: IToolData[] = [
+  // {
+  //   name: "Assets",
+  //   value: OtherTool.Assets,
+  //   icon: <AssetsIcon size="S" />,
+  // },
+  // {
+  //   name: "Layers",
+  //   value: OtherTool.Layers,
+  //   icon: <LayersIcon size="S" />,
+  // },
 ];
 
 const ToolBox = () => {

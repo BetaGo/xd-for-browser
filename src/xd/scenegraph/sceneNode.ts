@@ -2,9 +2,14 @@ import * as math from "mathjs";
 import { v4 as uuidv4 } from "uuid";
 
 import { Vector } from "../../utils/geometry/vector";
-import { radian2Degree } from "../../utils/math";
+import { degree2Radian, radian2Degree } from "../../utils/math";
 import { Bounds, Interaction, Point } from "../typedefs";
-import { createIdentityMatrix, Matrix } from "./matrix";
+import {
+  createIdentityMatrix,
+  createRotateMatrix,
+  createTranslateMatrix,
+  Matrix,
+} from "./matrix";
 
 export abstract class SceneNode {
   static BLEND_MODE_PASSTHROUGH = "BLEND_MODE_PASSTHROUGH";
@@ -94,6 +99,26 @@ export abstract class SceneNode {
     };
   }
 
+  removeFromParent() {
+    const idx = this.parent?.children.indexOf(this) ?? -1;
+    if (idx !== -1) {
+      this.parent?.children.splice(idx, 1);
+    }
+    this.parent = null;
+  }
+
+  rotateAround(deltaAngle: number, rotationCenter: Point): void {
+    let center = this.transform.transformPoint(rotationCenter);
+
+    let deltaRadian = degree2Radian(deltaAngle);
+    const tx = center.x;
+    const ty = center.y;
+    const m = createTranslateMatrix(-tx, -ty)
+      .multiLeft(createRotateMatrix(deltaRadian))
+      .multiLeft(createTranslateMatrix(tx, ty));
+    this.transform.multiLeft(m);
+  }
+
   readonly guid: string = uuidv4();
   readonly triggeredInteractions: Interaction[] = [];
   readonly children: SceneNode[] = [];
@@ -112,12 +137,10 @@ export abstract class SceneNode {
   abstract readonly isContainer: boolean;
 
   abstract restToAutoConstraints(): void;
-  abstract removeFromParent(): void;
   abstract moveInParentCoordinates(deltaX: number, deltaY: number): void;
   abstract placeInParentCoordinates(
     registrationPoint: Point,
     parentPoint: Point
   ): void;
-  abstract rotateAround(deltaAngle: number, rotationCenter: Point): void;
   abstract resize(width: number, height: number): void;
 }

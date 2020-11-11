@@ -1,7 +1,5 @@
-import { degree2Radian } from "../../utils/math";
 import { Bounds, Point } from "../typedefs";
 import { GraphicNode } from "./graphicNode";
-import { createRotateMatrix, createTranslateMatrix } from "./matrix";
 
 export class Rectangle extends GraphicNode {
   hasLinkedGraphicFill: boolean = false;
@@ -97,13 +95,7 @@ export class Rectangle extends GraphicNode {
     // TODO:
     throw new Error("Method not implemented.");
   }
-  removeFromParent(): void {
-    const idx = this.parent?.children.indexOf(this) ?? -1;
-    if (idx !== -1) {
-      this.parent?.children.splice(idx, 1);
-    }
-    this.parent = null;
-  }
+
   moveInParentCoordinates(deltaX: number, deltaY: number): void {
     // TODO:
     throw new Error("Method not implemented.");
@@ -111,18 +103,6 @@ export class Rectangle extends GraphicNode {
   placeInParentCoordinates(registrationPoint: Point, parentPoint: Point): void {
     // TODO:
     throw new Error("Method not implemented.");
-  }
-  rotateAround(deltaAngle: number, rotationCenter: Point): void {
-    let center = this.transform.transformPoint(rotationCenter);
-    // this.rotation = (this.rotation + deltaAngle) % 360;
-
-    let deltaRadian = degree2Radian(deltaAngle);
-    const tx = center.x;
-    const ty = center.y;
-    const m = createTranslateMatrix(-tx, -ty)
-      .multiLeft(createRotateMatrix(deltaRadian))
-      .multiLeft(createTranslateMatrix(tx, ty));
-    this.transform.multiLeft(m);
   }
   resize(width: number, height: number): void {
     // TODO:

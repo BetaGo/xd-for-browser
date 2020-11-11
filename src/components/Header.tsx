@@ -88,7 +88,7 @@ const Header = () => {
             Design
           </NavItem>
         </LeftActionItem>
-        <LeftActionItem>
+        {/* <LeftActionItem>
           <NavItem to="/prototype" activeClassName="active">
             Prototype
           </NavItem>
@@ -97,7 +97,7 @@ const Header = () => {
           <NavItem to="/share" activeClassName="active">
             Share
           </NavItem>
-        </LeftActionItem>
+        </LeftActionItem> */}
       </LeftActions>
       <CenterActions>XD Tutorial</CenterActions>
       <RightActions>{(canvasStore.zoomValue * 100).toFixed(2)}%</RightActions>
