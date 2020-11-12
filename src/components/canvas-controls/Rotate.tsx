@@ -156,13 +156,15 @@ const ResizeAndRotate = () => {
 
   const handleMouseDown = (e: MouseEvent) => {
     if (e.button === MouseEventButton.Main) {
-      startRotatePointRef.current = { x: e.screenX, y: e.screenY };
+      startRotatePointRef.current = { x: e.clientX, y: e.clientY };
       const bounds = rootNodeRef.current!.getBoundingClientRect();
       const rotateCenter: Point = {
         x: bounds.x + bounds.width / 2,
         y: bounds.y + bounds.height / 2,
       };
       rotateCenterPointRef.current = rotateCenter;
+    } else {
+      rotateCenterPointRef.current = null;
     }
   };
 
@@ -198,22 +200,9 @@ const ResizeAndRotate = () => {
       if (isRotateLeft) {
         rotateDeg = -rotateDeg;
       }
-      // const canvasCenter = canvasStore.clientPoint2CanvasPoint(rotateCenter);
+
       runInAction(() => {
         canvasStore.selection.items.forEach((node) => {
-          // let globalBounds = node.globalBounds;
-          // const rotateCenter: Point = {
-          //   x: canvasCenter.x - globalBounds.x,
-          //   y: canvasCenter.y - globalBounds.y,
-          // };
-          // const nodeCenter = node.globalTransform.transformPoint(
-          //   node.localCenterPoint
-          // );
-          // const rotateCenter = {
-          //   x: canvasCenter.x - nodeCenter.x,
-          //   y: canvasCenter.y - nodeCenter.y,
-          // };
-          // console.log(rotateCenter);
           const rotateCenter = node.localCenterPoint;
           node.rotateAround(rotateDeg, rotateCenter);
         });

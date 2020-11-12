@@ -1,11 +1,15 @@
 import { observer } from "mobx-react";
-import React, { useRef } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
+import { MouseEventButton } from "../../constants";
 
 import { IBoundingRect } from "../../draw/shape";
 import { useStores } from "../../hooks/useStores";
 import styled from "../../styles/styled";
 import { Point } from "../../utils/geometry";
+import { Rectangle } from "../../xd/scenegraph/rectangle";
 import { getBoundingRectPoints } from "../../xd/sceneNode.helpers";
+
+import { afterBoundsChange } from "../../reactions/helpers/afterNodeBoundsChange";
 
 type ResizeEdge = "n" | "e" | "s" | "w" | "ne" | "nw" | "se" | "sw";
 
@@ -123,7 +127,9 @@ const ControlPoint = styled.div<{
 const Resize = () => {
   const { canvasStore } = useStores();
   const selectedEdgeRef = useRef<ResizeEdge | null>(null);
+  const rootNodeRef = useRef<HTMLDivElement | null>(null);
   const rotationRef = useRef(0);
+  const preMovePointRef = useRef<Point | null>(null);
 
   const dpr = canvasStore.dpr;
   const scale = canvasStore.zoomValue;
@@ -131,7 +137,10 @@ const Resize = () => {
 
   const getStyles = (): React.CSSProperties => {
     let items = canvasStore.selection.items;
-    if (!items.length) return {};
+    if (!items.length)
+      return {
+        display: "none",
+      };
     let res: IBoundingRect;
     if (items.length === 1) {
       let item = items[0];
@@ -172,112 +181,137 @@ const Resize = () => {
     };
   };
 
-  // const { selectedElement, selectedElements } = canvasStore;
-
-  // if (!selectedElement) return null;
-
-  const handleOnDrag = (e: React.MouseEvent) => {
-    // const rect = canvasMouseStore.containerDomElement!.getBoundingClientRect();
-    // canvasMouseStore.update({
-    //   isMouseMoving: true,
-    //   currentMouseX: e.clientX - rect.x,
-    //   currentMouseY: e.clientY - rect.y,
-    // });
+  const handleMouseDown = (e: MouseEvent) => {
+    if (e.button === MouseEventButton.Main) {
+      preMovePointRef.current = { x: e.clientX, y: e.clientY };
+      if (e.target instanceof HTMLElement) {
+        selectedEdgeRef.current = e.target.dataset.edge as ResizeEdge;
+      }
+    } else {
+      preMovePointRef.current = null;
+      selectedEdgeRef.current = null;
+    }
   };
 
-  const handleDragEnd = (e: React.MouseEvent) => {
-    // selectedEdgeRef.current = null;
-    // canvasMouseStore.update({
-    //   isMouseDown: false,
-    // });
+  const handleMouseMove = useCallback(
+    (e: MouseEvent) => {
+      if (!preMovePointRef.current || !selectedEdgeRef.current) return;
+      let selectedItems = canvasStore.selection.items;
+      if (!selectedItems.length) return;
+
+      const prePoint = preMovePointRef.current;
+      const curPoint: Point = { x: e.clientX, y: e.clientY };
+
+      const prePointInCanvas = canvasStore.clientPoint2CanvasPoint(prePoint);
+      const curPointInCanvas = canvasStore.clientPoint2CanvasPoint(curPoint);
+      const dx = curPointInCanvas.x - prePointInCanvas.x;
+      const dy = curPointInCanvas.y - prePointInCanvas.y;
+
+      if (!(dx || dy)) {
+        return;
+      }
+
+      if (selectedItems.length > 1) {
+        // TODO: 多个选中图形的 resize
+        return;
+      }
+
+      const selectedItem = selectedItems[0];
+
+      const resizeEdge = selectedEdgeRef.current;
+      switch (resizeEdge) {
+        case "nw":
+          break;
+        case "e": {
+          if (selectedItem instanceof Rectangle) {
+            selectedItem.width += dx;
+          }
+          break;
+        }
+        case "se": {
+          if (selectedItem instanceof Rectangle) {
+            selectedItem.width += dx;
+            selectedItem.height += dy;
+          }
+          break;
+        }
+        case "s": {
+          if (selectedItem instanceof Rectangle) {
+            selectedItem.height += dy;
+          }
+          break;
+        }
+        default:
+          break;
+      }
+
+      preMovePointRef.current = curPoint;
+      canvasStore.render();
+      afterBoundsChange(selectedItem);
+    },
+    [canvasStore]
+  );
+
+  const handleMouseUp = (e: MouseEvent) => {
+    preMovePointRef.current = null;
+    selectedEdgeRef.current = null;
   };
 
-  if (!canvasStore.selection.items.length) {
-    return null;
-  }
+  useEffect(() => {
+    document.addEventListener("mouseup", handleMouseUp);
+    document.addEventListener("mousemove", handleMouseMove);
+    const rootNode = rootNodeRef.current!;
+
+    rootNode.addEventListener("mousedown", handleMouseDown);
+    return () => {
+      document.removeEventListener("mouseup", handleMouseUp);
+      document.removeEventListener("mousemove", handleMouseMove);
+      rootNode.removeEventListener("mousedown", handleMouseDown);
+    };
+  }, [handleMouseMove]);
+
   const styles = getStyles();
   return (
-    <Root style={styles}>
+    <Root style={styles} ref={rootNodeRef}>
       <ControlPoint
         currentRotation={rotationRef.current}
         resizeEdge="nw"
-        // draggable
-        onDragStart={() => {
-          console.log("dddstart");
-          selectedEdgeRef.current = "nw";
-        }}
-        onDrag={handleOnDrag}
-        onDragEnd={handleDragEnd}
+        data-edge="nw"
       ></ControlPoint>
       <ControlPoint
         currentRotation={rotationRef.current}
         resizeEdge="n"
-        // draggable
-        onDragStart={(e) => {
-          selectedEdgeRef.current = "n";
-        }}
-        onDrag={handleOnDrag}
-        onDragEnd={handleDragEnd}
+        data-edge="n"
       />
       <ControlPoint
         currentRotation={rotationRef.current}
         resizeEdge="ne"
-        // draggable
-        onDragStart={(e) => {
-          selectedEdgeRef.current = "ne";
-        }}
-        onDrag={handleOnDrag}
-        onDragEnd={handleDragEnd}
+        data-edge="ne"
       />
       <ControlPoint
         currentRotation={rotationRef.current}
         resizeEdge="e"
-        // draggable
-        onDragStart={(e) => {
-          selectedEdgeRef.current = "e";
-        }}
-        onDrag={handleOnDrag}
-        onDragEnd={handleDragEnd}
+        data-edge="e"
       />
       <ControlPoint
         currentRotation={rotationRef.current}
         resizeEdge="se"
-        // draggable
-        onDragStart={(e) => {
-          selectedEdgeRef.current = "se";
-        }}
-        onDrag={handleOnDrag}
-        onDragEnd={handleDragEnd}
+        data-edge="se"
       />
       <ControlPoint
         currentRotation={rotationRef.current}
         resizeEdge="s"
-        // draggable
-        onDragStart={(e) => {
-          selectedEdgeRef.current = "w";
-        }}
-        onDrag={handleOnDrag}
-        onDragEnd={handleDragEnd}
+        data-edge="s"
       />
       <ControlPoint
         currentRotation={rotationRef.current}
         resizeEdge="sw"
-        // draggable
-        onDragStart={(e) => {
-          selectedEdgeRef.current = "sw";
-        }}
-        onDrag={handleOnDrag}
-        onDragEnd={handleDragEnd}
+        data-edge="sw"
       />
       <ControlPoint
         currentRotation={rotationRef.current}
         resizeEdge="w"
-        // draggable
-        onDragStart={(e) => {
-          selectedEdgeRef.current = "w";
-        }}
-        onDrag={handleOnDrag}
-        onDragEnd={handleDragEnd}
+        data-edge="w"
       />
     </Root>
   );

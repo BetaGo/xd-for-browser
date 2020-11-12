@@ -30,6 +30,7 @@ export class Selection {
   }
   // TODO:
   insertionParent: SceneNode | null = null;
+
   focusedArtboard: Artboard | null = null;
   editContext: SceneNode | null = null;
   isInEditContext(node: SceneNode): boolean {

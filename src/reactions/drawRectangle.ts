@@ -3,10 +3,9 @@ import { reaction } from "mobx";
 import { DesignTool } from "../constants";
 import { globalStores } from "../contexts";
 import { Rectangle } from "../draw/elements/rectangle";
-import { RootNode } from "../draw/elements/rootNode";
 import { Point } from "../utils/geometry";
 import { Color } from "../xd/scenegraph/color";
-import { moveNode } from "../xd/sceneNode.helpers";
+import { afterBoundsChange } from "./helpers/afterNodeBoundsChange";
 
 const { uiStore, canvasStore, canvasMouseStore } = globalStores;
 
@@ -29,25 +28,7 @@ export const createDrawRectReaction = () => {
         !d.isMainButtonDown
       ) {
         if (creatingRect) {
-          if (creatingRect.parent instanceof RootNode) {
-            const endPoint: Point = {
-              x: creatingRect.globalTransform.e,
-              y: creatingRect.globalTransform.f,
-            };
-            const startPoint: Point = {
-              x: creatingRect.globalTransform.e + creatingRect.width,
-              y: creatingRect.globalTransform.f + creatingRect.height,
-            };
-            for (let artboard of canvasStore.artboards) {
-              if (
-                artboard.isInnerPoint(startPoint) ||
-                artboard.isInnerPoint(endPoint)
-              ) {
-                moveNode(creatingRect, artboard);
-                return;
-              }
-            }
-          }
+          afterBoundsChange(creatingRect);
           creatingRect = null;
         }
         return;

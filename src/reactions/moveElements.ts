@@ -2,11 +2,9 @@ import { reaction } from "mobx";
 
 import { DesignTool } from "../constants";
 import { globalStores } from "../contexts";
-import { Artboard } from "../draw/elements/artboard";
-import { isRectOverlap } from "../utils/geometry";
 import { Matrix } from "../xd/scenegraph/matrix";
 import { SceneNode } from "../xd/scenegraph/sceneNode";
-import { getBoundingRectPoints, moveNode } from "../xd/sceneNode.helpers";
+import { afterBoundsChange } from "./helpers/afterNodeBoundsChange";
 
 const { uiStore, canvasStore, canvasMouseStore } = globalStores;
 
@@ -35,45 +33,12 @@ export const createMoveElementsReaction = () => {
         if (!transformList.length) {
           return;
         }
-        const elementParentArtboardMap: WeakMap<
-          SceneNode,
-          Artboard[]
-        > = new WeakMap();
         transformList.forEach((v) => {
           const current = transformMap.get(v);
           if (!current) {
             return;
           }
-          canvasStore.artboards.forEach((artboard) => {
-            const artboardRectPath = getBoundingRectPoints(
-              artboard.localBounds,
-              artboard.globalTransform
-            );
-            const currentRectPath = getBoundingRectPoints(
-              current.localBounds,
-              current.globalTransform
-            );
-            if (isRectOverlap(artboardRectPath, currentRectPath)) {
-              const parents = elementParentArtboardMap.get(current) || [];
-              parents.push(artboard);
-              elementParentArtboardMap.set(current, parents);
-            }
-          });
-          let parents = elementParentArtboardMap.get(current);
-          if (!parents || parents.length === 0) {
-            let rootNode = canvasStore.gRender?.rootNode;
-            if (!rootNode) return;
-            moveNode(current, rootNode);
-          } else {
-            if (
-              !(
-                current.parent instanceof Artboard &&
-                parents.includes(current.parent)
-              )
-            ) {
-              moveNode(current, parents[0]);
-            }
-          }
+          afterBoundsChange(current);
           transformMap.delete(v);
         });
         transformList = [];

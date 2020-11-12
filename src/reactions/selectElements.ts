@@ -93,6 +93,11 @@ export const createSelectElementsReaction = () => {
           width,
           height,
         };
+        canvasStore.selection.insertionParent =
+          canvasStore.gRender?.rootNode || null;
+        canvasStore.selection.editContext =
+          canvasStore.gRender?.rootNode || null;
+        canvasStore.selection.focusedArtboard = null;
       }
       if (uiStore.selectionRect.show) {
         const selectedElements: Set<SceneNode> = new Set();
@@ -116,12 +121,16 @@ export const createSelectElementsReaction = () => {
             y: currentMouseY,
           },
         ];
+        let parentNodes = new Set<SceneNode>();
         while (list.length) {
           const current = list.shift();
           if (!current) break;
           if (current instanceof Artboard) {
             list.push(...current.children);
           } else {
+            if (current.parent) {
+              parentNodes.add(current.parent);
+            }
             const rectPath = getBoundingRectPoints(
               current.localBounds,
               current.globalTransform
@@ -130,6 +139,20 @@ export const createSelectElementsReaction = () => {
               selectedElements.add(current);
             }
           }
+        }
+        if (parentNodes.size === 1) {
+          let parent = [...parentNodes.values()][0];
+          canvasStore.selection.insertionParent = parent;
+          canvasStore.selection.editContext = parent;
+          if (parent instanceof Artboard) {
+            canvasStore.selection.focusedArtboard = parent;
+          }
+        } else {
+          canvasStore.selection.insertionParent =
+            canvasStore.gRender?.rootNode || null;
+          canvasStore.selection.editContext =
+            canvasStore.gRender?.rootNode || null;
+          canvasStore.selection.focusedArtboard = null;
         }
         canvasStore.selection.itemsIncludingLocked = [...selectedElements];
       }
