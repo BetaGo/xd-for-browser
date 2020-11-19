@@ -58,4 +58,5 @@ const _afterBoundsChange = (current: SceneNode) => {
   }
 };
 
-export const afterBoundsChange = _.debounce(_afterBoundsChange, 100);
+export const afterBoundsChangeDebounced = _.debounce(_afterBoundsChange, 100);
+export const afterBoundsChange = _afterBoundsChange;
