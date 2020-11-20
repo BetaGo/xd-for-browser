@@ -64,8 +64,10 @@ export class Vector {
   }
 
   getAngle(vector: Vector): number {
-    let cosA =
-      this.dotProduct(vector) / (this.getMagnitude() * vector.getMagnitude());
+    let cosA = Math.min(
+      1,
+      this.dotProduct(vector) / (this.getMagnitude() * vector.getMagnitude())
+    );
     return Math.acos(cosA);
   }
 }
