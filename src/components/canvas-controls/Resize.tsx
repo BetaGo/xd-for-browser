@@ -10,6 +10,7 @@ import { Rectangle } from "../../xd/scenegraph/rectangle";
 import { getBoundingRectPoints } from "../../xd/sceneNode.helpers";
 
 import { afterBoundsChange } from "../../reactions/helpers/afterNodeBoundsChange";
+import { runInAction } from "mobx";
 
 type ResizeEdge = "n" | "e" | "s" | "w" | "ne" | "nw" | "se" | "sw";
 
@@ -211,43 +212,45 @@ const Resize = () => {
         return;
       }
 
-      if (selectedItems.length > 1) {
-        // TODO: 多个选中图形的 resize
-        return;
-      }
-
-      const selectedItem = selectedItems[0];
-
-      const resizeEdge = selectedEdgeRef.current;
-      switch (resizeEdge) {
-        case "nw":
-          break;
-        case "e": {
-          if (selectedItem instanceof Rectangle) {
-            selectedItem.width += dx;
-          }
-          break;
+      runInAction(() => {
+        if (selectedItems.length > 1) {
+          // TODO: 多个选中图形的 resize
+          return;
         }
-        case "se": {
-          if (selectedItem instanceof Rectangle) {
-            selectedItem.width += dx;
-            selectedItem.height += dy;
-          }
-          break;
-        }
-        case "s": {
-          if (selectedItem instanceof Rectangle) {
-            selectedItem.height += dy;
-          }
-          break;
-        }
-        default:
-          break;
-      }
 
-      preMovePointRef.current = curPoint;
-      canvasStore.render();
-      afterBoundsChange(selectedItem);
+        const selectedItem = selectedItems[0];
+
+        const resizeEdge = selectedEdgeRef.current;
+        switch (resizeEdge) {
+          case "nw":
+            break;
+          case "e": {
+            if (selectedItem instanceof Rectangle) {
+              selectedItem.width += dx;
+            }
+            break;
+          }
+          case "se": {
+            if (selectedItem instanceof Rectangle) {
+              selectedItem.width += dx;
+              selectedItem.height += dy;
+            }
+            break;
+          }
+          case "s": {
+            if (selectedItem instanceof Rectangle) {
+              selectedItem.height += dy;
+            }
+            break;
+          }
+          default:
+            break;
+        }
+
+        preMovePointRef.current = curPoint;
+        canvasStore.render();
+        afterBoundsChange(selectedItem);
+      });
     },
     [canvasStore]
   );
