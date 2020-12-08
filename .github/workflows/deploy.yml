@@ -8,6 +8,7 @@ jobs:
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
+      - uses: jetli/wasm-pack-action@v0.3.0
       - name: Install Packages
         run: yarn
       - name: Build page
