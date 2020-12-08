@@ -9,6 +9,9 @@ import { HashRouter as Router, Route, Switch } from "react-router-dom";
 import HomePage from "./pages/Home";
 import StartPage from "./pages/Start";
 import { defaultTheme } from "./styles/theme";
+import { greet } from "xd-wasm";
+
+greet();
 
 function App() {
   return (

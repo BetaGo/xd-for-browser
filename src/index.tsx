@@ -1,22 +1,10 @@
-import "./index.css";
-import "./reactions/reactions";
-
-import React from "react";
-import ReactDOM from "react-dom";
-
-import App from "./App";
-import { listenKeyboardEvents } from "./keyboard";
 import reportWebVitals from "./reportWebVitals";
 import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
+import "./index.css";
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById("root")
-);
-
-listenKeyboardEvents();
+import("./bootstrap").then(() => {
+  document.getElementById("loading")?.remove();
+});
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
